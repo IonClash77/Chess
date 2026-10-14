@@ -1,1425 +1,700 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="dark scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Dice Roll | Classic, Modern &amp; Polyhedral Dice Games Compendium</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEAD SECTOR // The Roll & Write Zombie Survival Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            abyss: '#060a12',
+            navy: {
+              950: '#0a1120',
+              900: '#0f172a',
+              800: '#1e293b',
+              700: '#1e3a8a',
+            },
+            crimson: {
+              600: '#dc2626',
+              700: '#b91c1c',
+              900: '#7f1d1d',
+            },
+            hazard: '#eab308',
+            toxic: '#22c55e'
+          },
+          fontFamily: {
+            stencil: ['"Black Ops One"', 'cursive'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #060a12;
+      color: #e2e8f0;
+      background-image: 
+        radial-gradient(circle at 20% 15%, rgba(185, 28, 28, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(30, 58, 138, 0.18) 0%, transparent 45%),
+        linear-gradient(rgba(15, 23, 42, 0.35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.35) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    }
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        midnight: {
-                            950: '#080e18',
-                            900: '#0d1829', /* Primary navy anchor */
-                            850: '#122038', /* Card surfaces & felt backing */
-                            800: '#182a47',
-                            700: '#233a61',
-                            600: '#344f7e',
-                        },
-                        surface: {
-                            bg: '#f1f5f9',    /* Light slate background */
-                            card: '#ffffff',
-                            muted: '#e2e8f0',
-                            border: '#cbd5e1'
-                        },
-                        coral: {
-                            DEFAULT: '#ff6448',
-                            hover: '#eb5236',
-                            light: '#fff1ee'
-                        },
-                        amber: {
-                            DEFAULT: '#f59e0b',
-                            light: '#fef3c7'
-                        },
-                        teal: {
-                            DEFAULT: '#0d9488',
-                            light: '#ccfbf1'
-                        },
-                        indigo: {
-                            DEFAULT: '#6366f1',
-                            light: '#e0e7ff'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-                        display: ['"Outfit"', 'sans-serif'],
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(13, 24, 41, 0.07)',
-                        'card': '0 1px 3px rgba(13, 24, 41, 0.05), 0 10px 25px -4px rgba(13, 24, 41, 0.05)',
-                        'die': '0 2px 0 #cbd5e1, 0 8px 16px -2px rgba(13, 24, 41, 0.12)',
-                        'die-held': '0 0 0 2px #ff6448, 0 8px 20px rgba(255, 100, 72, 0.35)',
-                        'felt': 'inset 0 2px 8px rgba(0,0,0,0.35), 0 20px 40px -15px rgba(13, 24, 41, 0.4)'
-                    }
-                }
-            }
-        }
-    </script>
+    .hazard-stripe {
+      background: repeating-linear-gradient(
+        -45deg,
+        #eab308,
+        #eab308 14px,
+        #0a1120 14px,
+        #0a1120 28px
+      );
+    }
 
-    <style>
-        .die-box {
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
-            user-select: none;
-            touch-action: manipulation;
-        }
-        .die-box:hover:not(.locked) {
-            transform: translateY(-4px) scale(1.02);
-        }
-        .die-box.rolling {
-            animation: cleanBounce 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-        }
+    .crimson-stripe {
+      background: repeating-linear-gradient(
+        -45deg,
+        #991b1b,
+        #991b1b 12px,
+        #060a12 12px,
+        #060a12 24px
+      );
+    }
 
-        @keyframes cleanBounce {
-            0% { transform: translateY(0) rotate(0deg) scale(0.96); }
-            30% { transform: translateY(-20px) rotate(-10deg) scale(1.08); }
-            60% { transform: translateY(-5px) rotate(8deg) scale(1.03); }
-            100% { transform: translateY(0) rotate(0deg) scale(1); }
-        }
+    .blood-glow {
+      text-shadow: 0 0 25px rgba(220, 38, 38, 0.55);
+    }
 
-        .pip {
-            width: 9px;
-            height: 9px;
-            background-color: #0d1829;
-            border-radius: 9999px;
-            display: inline-block;
-        }
-        .pip-accent {
-            background-color: #ff6448;
-        }
-    </style>
+    .card-grit {
+      background: linear-gradient(160deg, rgba(15, 23, 42, 0.92) 0%, rgba(10, 17, 32, 0.98) 100%);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
+    }
+
+    .die-face {
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+    .die-face:hover:not(:disabled) {
+      transform: translateY(-3px) scale(1.03);
+    }
+  </style>
 </head>
-<body class="bg-surface-bg text-slate-800 font-sans antialiased selection:bg-coral selection:text-white">
+<body class="antialiased selection:bg-crimson-600 selection:text-white">
 
-    <!-- Header Navigation -->
-    <header class="sticky top-0 z-40 bg-midnight-900/95 backdrop-blur-md border-b border-midnight-800 text-white">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-18 py-3.5 flex items-center justify-between">
-            <!-- Brand -->
-            <a href="#" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-xl bg-coral flex items-center justify-center font-display font-black text-white text-xl shadow-lg group-hover:scale-105 transition-transform">
-                    <span>⚄</span>
-                </div>
-                <div class="flex flex-col">
-                    <div class="flex items-center gap-1.5">
-                        <span class="font-display font-extrabold text-xl tracking-tight text-white leading-none">The Dice Roll</span>
-                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-midnight-800 text-slate-300 border border-midnight-700 font-semibold uppercase">Compendium</span>
-                    </div>
-                    <span class="text-[11px] text-slate-400 font-medium mt-0.5">Classic, Polyhedral &amp; Solo Dice Games</span>
-                </div>
-            </a>
-
-            <!-- Desktop Nav -->
-            <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-300">
-                <a href="#tray" class="hover:text-white transition flex items-center gap-1.5 text-coral font-bold">
-                    <span class="w-1.5 h-1.5 rounded-full bg-coral"></span>
-                    Roll Tray
-                </a>
-                <a href="#library" class="hover:text-white transition">All Games (22)</a>
-                <a href="#probability" class="hover:text-white transition">Probability</a>
-                <a href="#scorecards" class="hover:text-white transition">Scorecards</a>
-            </nav>
-
-            <!-- Actions -->
-            <div class="flex items-center gap-3">
-                <a href="#tray" class="px-4 py-2 rounded-xl text-xs font-bold bg-coral hover:bg-coral-hover text-white transition-all shadow-md">
-                    Open Tray
-                </a>
-            </div>
+  <!-- TOP BIOHAZARD TAPE -->
+  <div class="hazard-stripe h-2.5 w-full"></div>
+  <div class="bg-navy-950/90 border-b border-slate-800/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3 group">
+        <span class="w-9 h-9 rounded bg-crimson-600 flex items-center justify-center font-stencil text-xl text-white shadow-lg shadow-crimson-600/30 group-hover:bg-crimson-700 transition">DS</span>
+        <div>
+          <span class="font-stencil tracking-wider text-xl text-white block leading-none">DEAD SECTOR</span>
+          <span class="font-mono text-[10px] tracking-widest text-crimson-600 uppercase"> Pencil & Dice Survival Horror</span>
         </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="bg-midnight-900 text-white py-14 sm:py-20 border-b border-midnight-800 relative overflow-hidden">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-midnight-800/90 border border-midnight-700 text-xs font-semibold text-slate-300 mb-6 shadow-sm">
-                <span class="w-2 h-2 rounded-full bg-coral animate-pulse"></span>
-                <span>D4 through D20 • Pencil &amp; Scrap Paper • Zero Screen Clutter</span>
-            </div>
-
-            <h1 class="font-display text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
-                Geometric faces. <br>
-                A universe of <span class="text-transparent bg-clip-text bg-gradient-to-r from-coral via-amber-300 to-teal">analog games.</span>
-            </h1>
-
-            <p class="mt-5 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-                Plain-English rules for timeless push-your-luck classics, tense bluffing duels, five cozy solo quests, and ten brand-new original polyhedral games.
-            </p>
-
-            <!-- Quick Filter Chips -->
-            <div class="mt-8 flex flex-wrap items-center justify-center gap-2 text-xs font-medium">
-                <span class="text-slate-400 mr-1">Quick Jump:</span>
-                <button onclick="filterCategory('Polyhedral')" class="px-3.5 py-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-500/30 transition font-semibold flex items-center gap-1.5">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i> 10 New Polyhedral Games
-                </button>
-                <button onclick="filterCategory('Solo Games')" class="px-3 py-1.5 rounded-xl bg-teal/20 text-teal border border-teal/40 hover:bg-teal/30 transition font-semibold">Solo Games (5)</button>
-                <button onclick="filterCategory('Push-Your-Luck')" class="px-3 py-1.5 rounded-xl bg-midnight-800 hover:bg-midnight-700 text-slate-200 border border-midnight-700 transition">Push-Your-Luck</button>
-                <button onclick="filterCategory('Social & Bluffing')" class="px-3 py-1.5 rounded-xl bg-midnight-800 hover:bg-midnight-700 text-slate-200 border border-midnight-700 transition">Bluffing &amp; Social</button>
-                <button onclick="filterCategory('Classic Strategy')" class="px-3 py-1.5 rounded-xl bg-midnight-800 hover:bg-midnight-700 text-slate-200 border border-midnight-700 transition">Classic Strategy</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- INTERACTIVE ROLL TRAY -->
-    <section id="tray" class="py-14 sm:py-18 bg-surface-bg border-b border-surface-border">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6">
-            
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-4">
-                <div>
-                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-coral">Virtual Felt Arena</span>
-                    <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-midnight-900 mt-0.5">Midnight Roll Tray</h2>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-0.5">Click any die to hold or release. Press <strong class="text-midnight-900">Spacebar</strong> to roll.</p>
-                </div>
-                
-                <!-- Controls: Mode Selector & Audio -->
-                <div class="flex items-center gap-2.5 flex-wrap">
-                    <button onclick="toggleAudio()" id="audio-toggle-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-midnight-900 border border-surface-border shadow-sm transition" title="Toggle Dice Audio">
-                        <i id="audio-icon" data-lucide="volume-2" class="w-3.5 h-3.5 text-coral"></i>
-                        <span id="audio-label">Sound: On</span>
-                    </button>
-
-                    <div class="flex items-center p-1 bg-midnight-900 rounded-xl text-xs font-semibold text-slate-300 w-fit shadow-sm">
-                        <button id="mode-5d-btn" onclick="setRollMode('5d')" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-coral text-white font-bold transition shadow-sm">5× D6</button>
-                        <button id="mode-4d-btn" onclick="setRollMode('4d')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition">4× D6</button>
-                        <button id="mode-2d-btn" onclick="setRollMode('2d')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition">2× D6</button>
-                        <button id="mode-poly-btn" onclick="setRollMode('poly')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> Polyhedral Set
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- The Navy Felt Arena Box -->
-            <div class="bg-midnight-900 rounded-3xl border-4 border-midnight-800 shadow-felt p-6 sm:p-10 flex flex-col items-center relative overflow-hidden">
-                <!-- Dice Rack Area -->
-                <div id="dice-rack" class="flex flex-wrap items-center justify-center gap-3 sm:gap-5 min-h-[140px] py-4 w-full relative z-10">
-                    <!-- Populated dynamically by JS -->
-                </div>
-
-                <!-- Live Evaluation Pill -->
-                <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs font-semibold relative z-10">
-                    <span class="px-3.5 py-1.5 rounded-full bg-midnight-850 text-slate-200 border border-midnight-700">
-                        Sum: <strong id="tray-sum" class="font-mono text-amber text-sm ml-1">0</strong>
-                    </span>
-                    <span id="tray-combo-pill" class="px-3.5 py-1.5 rounded-full bg-teal/20 text-teal border border-teal/30">
-                        Ready to roll
-                    </span>
-                    <span id="tray-rolls-count" class="px-3 py-1.5 rounded-full bg-midnight-800 text-slate-400 font-mono text-[11px]">Rolls: 0</span>
-                </div>
-
-                <!-- Action Controls -->
-                <div class="mt-7 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto relative z-10">
-                    <button id="roll-button" onclick="executeRoll()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-coral hover:bg-coral-hover text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2">
-                        <i data-lucide="dices" class="w-4 h-4 text-white"></i>
-                        <span>Roll Dice (Space)</span>
-                    </button>
-                    <button onclick="resetDiceTray()" class="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-midnight-800 hover:bg-midnight-700 text-slate-300 font-semibold text-sm border border-midnight-700 transition">
-                        Unhold All / Reset
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
-    </section>
-
-    <!-- THE GAMES DIRECTORY -->
-    <section id="library" class="py-14 sm:py-20 border-b border-surface-border bg-surface-bg">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-                <div>
-                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-midnight-700">The Compendium</span>
-                    <h2 class="font-display text-3xl font-extrabold text-midnight-900 mt-0.5">Rules Directory</h2>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-0.5">Complete plain-English tabletop guides for standard cubes and polyhedral dice sets.</p>
-                </div>
-
-                <!-- Search Input and Random Discovery -->
-                <div class="flex items-center gap-2.5 w-full md:w-auto">
-                    <div class="relative flex-1 md:w-64">
-                        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="game-search" oninput="handleSearch()" placeholder="Search title, die, or mechanic..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-surface-border text-xs text-midnight-900 placeholder-slate-400 focus:outline-none focus:border-midnight-700 shadow-sm transition">
-                    </div>
-                    <button onclick="pickRandomGame()" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-midnight-900 hover:bg-midnight-800 text-white shadow-sm transition shrink-0" title="Pick a random game">
-                        <i data-lucide="shuffle" class="w-3.5 h-3.5 text-coral"></i>
-                        <span>Surprise Me</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Category Filter Tabs -->
-            <div class="flex flex-wrap items-center gap-2 mb-8" id="category-tabs">
-                <button onclick="filterCategory('All')" class="cat-pill active px-4 py-2 rounded-xl text-xs font-bold bg-midnight-900 text-white shadow transition">All Games (22)</button>
-                <button onclick="filterCategory('Polyhedral')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-surface-border hover:border-midnight-800 transition">Polyhedral (10)</button>
-                <button onclick="filterCategory('Solo Games')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-surface-border hover:border-midnight-800 transition">Solo Games (5)</button>
-                <button onclick="filterCategory('Push-Your-Luck')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-surface-border hover:border-midnight-800 transition">Push-Your-Luck</button>
-                <button onclick="filterCategory('Social & Bluffing')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-surface-border hover:border-midnight-800 transition">Social &amp; Bluffing</button>
-                <button onclick="filterCategory('Classic Strategy')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-surface-border hover:border-midnight-800 transition">Classic Strategy</button>
-            </div>
-
-            <!-- Games Grid -->
-            <div id="games-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <!-- Injected via JavaScript -->
-            </div>
-
-        </div>
-    </section>
-
-    <!-- 2D6 PROBABILITY MATRIX -->
-    <section id="probability" class="py-14 sm:py-18 bg-white border-b border-surface-border">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6">
-            <div class="text-center max-w-xl mx-auto mb-10">
-                <span class="text-xs font-mono font-bold uppercase tracking-wider text-amber">Dice Mathematics</span>
-                <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-midnight-900 mt-0.5">The Math of 36 Combinations</h2>
-                <p class="text-slate-600 text-xs sm:text-sm mt-1">When rolling two six-sided dice, the sum distribution forms a triangular probability curve.</p>
-            </div>
-
-            <!-- Visual Odds Graph -->
-            <div class="bg-surface-bg p-6 sm:p-8 rounded-3xl border border-surface-border">
-                <div class="grid grid-cols-11 gap-1.5 sm:gap-3 items-end h-48 sm:h-56 pb-2 border-b border-slate-300">
-                    <!-- 2 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">2.8%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 16%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">2</span>
-                    </div>
-                    <!-- 3 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">5.6%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 33%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">3</span>
-                    </div>
-                    <!-- 4 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">8.3%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 50%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">4</span>
-                    </div>
-                    <!-- 5 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">11.1%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 66%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">5</span>
-                    </div>
-                    <!-- 6 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">13.9%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 83%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">6</span>
-                    </div>
-                    <!-- 7 (Peak) -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[11px] font-mono font-bold text-coral">16.7%</span>
-                        <div class="w-full bg-coral rounded-t-lg transition-all shadow-md" style="height: 100%;"></div>
-                        <span class="font-mono text-xs font-bold text-coral">7</span>
-                    </div>
-                    <!-- 8 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">13.9%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 83%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">8</span>
-                    </div>
-                    <!-- 9 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">11.1%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 66%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">9</span>
-                    </div>
-                    <!-- 10 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">8.3%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 50%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">10</span>
-                    </div>
-                    <!-- 11 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">5.6%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 33%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">11</span>
-                    </div>
-                    <!-- 12 -->
-                    <div class="flex flex-col items-center gap-1.5 h-full justify-end">
-                        <span class="text-[10px] font-mono text-slate-500">2.8%</span>
-                        <div class="w-full bg-midnight-800 rounded-t-lg transition-all" style="height: 16%;"></div>
-                        <span class="font-mono text-xs font-bold text-midnight-900">12</span>
-                    </div>
-                </div>
-
-                <div class="mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 gap-2">
-                    <span><strong>Key takeaway:</strong> 7 is rolled 1 out of every 6 throws (6/36 combinations).</span>
-                    <span class="font-mono text-[11px] text-slate-500">Pairs probability: 6 in 36 (16.67%)</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SCORECARDS & REFERENCE -->
-    <section id="scorecards" class="py-14 sm:py-18 border-b border-surface-border bg-surface-bg">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6">
-            
-            <div class="text-center max-w-xl mx-auto mb-10">
-                <span class="text-xs font-mono font-bold uppercase tracking-wider text-coral">Scoring Aids</span>
-                <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-midnight-900 mt-0.5">Tabletop Trackers</h2>
-                <p class="text-slate-600 text-xs sm:text-sm mt-0.5">Printable references and scrap paper guides for your game nights.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Yacht Scorecard -->
-                <div class="bg-white p-6 rounded-3xl border border-surface-border shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-display font-bold text-lg text-midnight-900">Yacht / Yahtzee Sheet</h3>
-                            <span class="text-xs font-mono px-2 py-0.5 rounded bg-midnight-900 text-white font-bold">12 Rounds</span>
-                        </div>
-                        <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                            Standard 12-category progression including upper section (1s through 6s) and lower combos (Full House, Straights, Four of a Kind, Yacht, Choice).
-                        </p>
-                        <div class="bg-surface-bg rounded-2xl p-4 border border-surface-border font-mono text-[11px] text-slate-600 space-y-2">
-                            <div class="flex justify-between pb-1 border-b border-slate-200"><span>Upper Section (1s to 6s)</span><span class="font-bold text-midnight-900">Bonus if &ge; 63</span></div>
-                            <div class="flex justify-between pb-1 border-b border-slate-200"><span>Full House</span><span class="font-bold text-midnight-900">25 pts</span></div>
-                            <div class="flex justify-between pb-1 border-b border-slate-200"><span>Small / Large Straight</span><span class="font-bold text-midnight-900">30 / 40 pts</span></div>
-                            <div class="flex justify-between"><span>Yacht (5 of a kind)</span><span class="font-bold text-coral">50 pts</span></div>
-                        </div>
-                    </div>
-                    <button onclick="window.print()" class="mt-6 w-full py-2.5 rounded-xl bg-midnight-900 hover:bg-midnight-800 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow">
-                        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                        <span>Print Yacht Scorecard</span>
-                    </button>
-                </div>
-
-                <!-- Pig Race Tracker -->
-                <div class="bg-white p-6 rounded-3xl border border-surface-border shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-display font-bold text-lg text-midnight-900">Pig: Race to 100 Tracker</h3>
-                            <span class="text-xs font-mono px-2 py-0.5 rounded bg-teal text-white font-bold">2–6 Players</span>
-                        </div>
-                        <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                            Keep tally of each player’s cumulative score. Remind players of the core rule: rolling a 1 wipes your turn pot, but banking secures it forever.
-                        </p>
-                        <div class="bg-surface-bg rounded-2xl p-4 border border-surface-border font-mono text-[11px] text-slate-600 space-y-2">
-                            <div class="flex justify-between pb-1 border-b border-slate-200"><span>Target Goal</span><span class="font-bold text-midnight-900">100 Points</span></div>
-                            <div class="flex justify-between pb-1 border-b border-slate-200"><span>Roll a 1</span><span class="font-bold text-coral">Turn Bust (0 pts)</span></div>
-                            <div class="flex justify-between pb-1 border-b border-slate-200"><span>Roll 2 through 6</span><span class="font-bold text-midnight-900">Add to Turn Pot</span></div>
-                            <div class="flex justify-between"><span>Bank Action</span><span class="font-bold text-teal">Secured to Total</span></div>
-                        </div>
-                    </div>
-                    <button onclick="window.print()" class="mt-6 w-full py-2.5 rounded-xl bg-midnight-900 hover:bg-midnight-800 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow">
-                        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                        <span>Print Pig Tally Card</span>
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- RULES MODAL -->
-    <div id="rules-modal" class="fixed inset-0 z-50 bg-midnight-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl border border-surface-border max-w-xl w-full p-6 sm:p-8 shadow-2xl max-h-[88vh] overflow-y-auto relative animate-in fade-in zoom-in-95 duration-150">
-            <button onclick="closeRulesModal()" class="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-midnight-900 hover:bg-slate-100 transition">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-            <div id="modal-body">
-                <!-- Injected via JS -->
-            </div>
-        </div>
+      </a>
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-300">
+        <a href="#pitch" class="hover:text-white transition">The Experience</a>
+        <a href="#zones" class="hover:text-white transition">Quarantine Zones</a>
+        <a href="#demo" class="hover:text-crimson-500 transition font-semibold text-amber-400">Playable Encounter</a>
+        <a href="#under-the-hood" class="hover:text-white transition">How It Plays</a>
+      </nav>
+      <a href="#download" class="px-4 py-2 rounded bg-crimson-600 hover:bg-crimson-700 text-white font-mono text-xs uppercase tracking-wider font-bold shadow-lg shadow-crimson-600/25 transition">
+        Get Print & Play
+      </a>
     </div>
+  </div>
 
-    <!-- Footer Grounded in Deep Midnight Navy -->
-    <footer class="bg-midnight-950 text-slate-400 py-12 text-xs border-t border-midnight-800">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-3">
-                <div class="w-7 h-7 rounded-lg bg-coral flex items-center justify-center text-white font-display font-bold">
-                    <span>⚄</span>
-                </div>
-                <span class="font-display font-bold text-sm text-white">The Dice Roll</span>
-                <span class="text-midnight-800">/</span>
-                <span class="text-slate-400">Classic, Polyhedral &amp; Solo Tabletop Rules.</span>
+  <!-- HERO SECTION (PURE GAME PROMO) -->
+  <header class="relative overflow-hidden pt-14 pb-24 md:pt-20 md:pb-28 border-b border-slate-800/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="grid lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Left Column: Visceral Pitch -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-crimson-900/40 border border-crimson-600/50 text-crimson-400 font-mono text-xs uppercase tracking-widest">
+            <span class="w-2 h-2 rounded-full bg-crimson-500 animate-pulse"></span>
+            Solo & Co-Op Roll-and-Write Survival Horror
+          </div>
+
+          <h1 class="font-stencil text-4xl sm:text-6xl lg:text-7xl text-white tracking-tight leading-[1.03] blood-glow">
+            EVERY GUNSHOT REDRAWS THE MAP. <span class="text-crimson-600">EVERY 1 COSTS A BREATH.</span>
+          </h1>
+
+          <p class="text-lg sm:text-xl text-slate-300 leading-relaxed max-w-2xl">
+            Forget mossy stone corridors and static dungeon crawls. Grab a handful of D6s, a pencil, and a blank grid sheet. You are trapped inside a collapsing quarantine zone where your dice pool is your heartbeat, your flashlight battery is dying, and the walls are closing in.
+          </p>
+
+          <div class="flex flex-wrap gap-4 pt-2">
+            <a href="#demo" class="px-7 py-4 rounded-lg bg-crimson-600 hover:bg-crimson-700 text-white font-stencil tracking-wider text-lg shadow-xl shadow-crimson-900/50 transition flex items-center gap-3">
+              <span>SURVIVE THE PHARMACY BREACH</span>
+              <span class="font-mono text-xs bg-black/30 px-2 py-1 rounded">LIVE DEMO</span>
+            </a>
+            <a href="#zones" class="px-6 py-4 rounded-lg bg-navy-900 hover:bg-navy-800 border border-slate-700 text-slate-200 font-semibold transition">
+              Explore the 4 Tapes
+            </a>
+          </div>
+
+          <!-- Quick Specs Bar -->
+          <div class="pt-6 grid grid-cols-3 gap-4 border-t border-slate-800/80 max-w-lg font-mono text-xs">
+            <div>
+              <span class="text-slate-500 block">PLAYERS</span>
+              <span class="text-white font-bold text-sm">1–2 Survivors</span>
             </div>
-            <div class="flex items-center gap-6 text-slate-400 font-semibold">
-                <a href="#tray" class="hover:text-coral transition">Play Tray</a>
-                <a href="#library" class="hover:text-white transition">All Games</a>
-                <a href="#probability" class="hover:text-white transition">Probability</a>
-                <a href="#scorecards" class="hover:text-white transition">Scorecards</a>
+            <div>
+              <span class="text-slate-500 block">EQUIPMENT</span>
+              <span class="text-white font-bold text-sm">6x D6 + Grid Sheet</span>
             </div>
-            <p class="text-slate-500">&copy; 2026 The Dice Roll. Open tabletop rules compendium.</p>
+            <div>
+              <span class="text-slate-500 block">PLAYTIME</span>
+              <span class="text-white font-bold text-sm">30–45 Mins</span>
+            </div>
+          </div>
         </div>
-    </footer>
 
-    <script>
-        // Complete Game Database: 10 Polyhedral + 5 Solo + 7 Classic (22 Total)
-        const GAMES = [
-            // ==================== 10 BRAND NEW POLYHEDRAL GAMES ====================
-            {
-                id: 'polyhedral-cascade',
-                title: 'Polyhedral Cascade',
-                subtitle: 'The Ascending Platonic Solid Ladder',
-                category: 'Polyhedral',
-                players: '2–4 Players',
-                dice: 'Full Set (d4, d6, d8, d10, d12, d20)',
-                time: '15–20 mins',
-                difficulty: 'Medium',
-                summary: 'Race to lock in a strictly ascending sequence from d4 to d20. Push your luck with each higher-sided die, but a cascade failure drops you back to your checkpoint.',
-                objective: 'Be the first player to successfully lock in an ascending sequence: d4 < d6 < d8 < d10 < d12 < d20.',
-                equipment: '1 polyhedral set per player (d4, d6, d8, d10, d12, d20) and paper.',
-                rules: [
-                    'Every round begins with all players simultaneously rolling their d4. This is your ladder base.',
-                    'On your turn, roll the next die in the chain (first d6, then d8, d10, d12, and finally d20).',
-                    'The Step Rule: The newly rolled die must show a value strictly greater than your previous locked die.',
-                    'Success: If higher, lock the die into your ladder. Choose to bank your progress, or immediately push your luck and roll the next die.',
-                    'Cascade Failure (Bust): If the die is equal to or lower than the previous locked die, your turn ends immediately! You lose all unbanked dice from this turn and drop back to your last banked position.',
-                    'The Capstone: To win, roll your d20 higher than your d12. Rolling a natural 20 at any point instantly wins the game!'
-                ],
-                tip: 'Bank your ladder early when your d8 or d10 lands on a comfortable middle number like 4 or 5.'
-            },
-            {
-                id: 'spire-dodecahedron',
-                title: 'Spire of the Dodecahedron',
-                subtitle: '12-Floor Masonry Weight Puzzle',
-                category: 'Polyhedral',
-                players: '1–2 Players',
-                dice: 'd4, d6, d8, d10, d12',
-                time: '15 mins',
-                difficulty: 'Medium',
-                summary: 'Quarry four polyhedral stones each round and stack them into a 12-story tower. Stones must never be heavier than the floor beneath them.',
-                objective: 'Fill all 12 floors of your Spire without causing an illegal structural collapse, scoring 60+ points.',
-                equipment: 'd4, d6, d8, d10, d12, and a sheet of paper with floors 1 to 12.',
-                rules: [
-                    'Draw a vertical ladder of 12 boxes numbered Floor 1 (Ground) to Floor 12 (Summit).',
-                    'Each round, roll the d4, d6, d8, and d10 together into the quarry.',
-                    'Assign each of the 4 rolled values to an empty floor on your ladder.',
-                    'Structural Law: No floor can contain a stone heavier (higher numerical value) than the stone directly underneath it.',
-                    'The Keystone (d12): Exactly once during the game, roll the d12. It acts as an alchemical keystone, legally ignoring the weight law for that single floor.',
-                    'Game ends after 3 quarry rounds (all 12 floors filled). Sum all placed numbers. Scoring 60+ wins Architect honors!'
-                ],
-                tip: 'Reserve high d10 and d8 rolls for Floors 1–3 early on to establish a broad structural foundation.'
-            },
-            {
-                id: 'orbit-apogee',
-                title: 'Orbit & Apogee',
-                subtitle: 'Solar Gravity Corridors & Satellite Slingshots',
-                category: 'Polyhedral',
-                players: '2–5 Players',
-                dice: '1d20 (Sun), 2d10 (Gravity), 2d6 & 1d4 (Probes)',
-                time: '15–20 mins',
-                difficulty: 'Medium',
-                summary: 'The d20 sets the sun frequency and d10s govern gravity wells. Slingshot your satellite probe dice into exact orbital harmonics.',
-                objective: 'Collect 7 Orbit Stars before your satellite suffers gravitational collapse.',
-                equipment: '1d20, 2d10, 2d6, 1d4, and tokens.',
-                rules: [
-                    'Solar Alignment: Roll the d20 at the round start to establish the Solar Frequency (1–20).',
-                    'Gravity Wells: Roll 2d10. The difference (High d10 - Low d10) is the safe Gravity Threshold.',
-                    'Active Player rolls their probe dice: 2d6 + 1d4.',
-                    'Combine your probe dice with addition and subtraction in any arrangement (e.g., d6 + d6 - d4).',
-                    'Scoring: If your probe matches the d20 Solar Frequency exactly, gain 3 Stars. If it falls within the safe threshold corridor (d20 ± Gravity Threshold), gain 1 Star.',
-                    'Collision Hazard: If your probe total matches either individual d10 value exactly, you suffer an orbital collision and lose 1 Star!',
-                    'First player to reach 7 Stars wins.'
-                ],
-                tip: 'Use subtraction on the d4 to fine-tune your trajectory into the safe gravity window.'
-            },
-            {
-                id: 'critical-catch',
-                title: 'Critical Catch',
-                subtitle: 'High-Stakes Pool Bidding',
-                category: 'Polyhedral',
-                players: '3–6 Players',
-                dice: '1d8, 1d12, 1d20 + Tokens',
-                time: '15 mins',
-                difficulty: 'Easy',
-                summary: 'A fast push-your-luck wagering game. Choose whether to add a safe d8, bold d12, or volatile d20 to a running pot without crossing the 20 Ceiling.',
-                objective: 'Win the token pot by predicting ceiling limits or rolling an exact Critical 20.',
-                equipment: '1d8, 1d12, 1d20, and 10 betting chips per player.',
-                rules: [
-                    'A central pot starts at 0 with a strict Ceiling of 20 points.',
-                    'In turn order, players choose one die to roll and add to the pot total: d8 (Gentle), d12 (Bold), or d20 (Wild).',
-                    'Before rolling, you may wager 1–3 chips that the total will NOT exceed 20.',
-                    'If your roll causes the pot to exceed 20, you bust and forfeit 3 chips to the central vault.',
-                    'Critical Catch: If your roll lands on exactly 20, you instantly claim all tokens in the pot!',
-                    'After a bust or Critical Catch, the pot resets to 0.'
-                ],
-                tip: 'When the pot is sitting at 12–15, switching to the d8 gives you the best mathematical odds of surviving.'
-            },
-            {
-                id: 'd4-caltrop',
-                title: 'D4 Caltrop',
-                subtitle: 'Tactical Parchment Area Denial',
-                category: 'Polyhedral',
-                players: '2 Players',
-                dice: '6d4 (3 per player), 1d10, 1d12',
-                time: '15–20 mins',
-                difficulty: 'Medium',
-                summary: 'Deploy sharp 4-sided dice as caltrop spike traps across an 8×8 grid. Threaten enemy territory and pin their dice.',
-                objective: 'Score 15 trap points or pin all three opponent caltrops.',
-                equipment: '6d4 (3 of one color, 3 of another), 1d10, 1d12, grid paper.',
-                rules: [
-                    'Draw an 8×8 grid on paper. Each player takes three d4s.',
-                    'On your turn, roll the d10 (X-axis, reroll 9–10) and d12 (Y-axis, reroll 9–12) for coordinate placement.',
-                    'Drop or move one of your d4 dice onto that square. The face-up number is its Spike Radius (orthogonally threatened squares).',
-                    'Threatening an enemy caltrop with a higher spike value pins their die and scores points equal to the difference.',
-                    'First player to reach 15 points or pin all 3 opposing caltrops wins.'
-                ],
-                tip: 'Caltrops showing a 4 threaten huge corridors of the board; place them near central junctions.'
-            },
-            {
-                id: 'alchemists-crucible',
-                title: "Alchemist's Crucible",
-                subtitle: 'Mathematical Elemental Transmutation',
-                category: 'Polyhedral',
-                players: '1–2 Players',
-                dice: 'Full Set (d4, d6, d8, d10, d12, d20)',
-                time: '15 mins',
-                difficulty: 'Hard',
-                summary: 'The d20 represents pure gold quintessence. Transmute base metals (d4 through d12) through arithmetic into clean divisors of the catalyst.',
-                objective: 'Reduce your pool until every remaining die value is an exact mathematical divisor of the d20.',
-                equipment: 'Complete polyhedral set (d4, d6, d8, d10, d12, d20) and paper.',
-                rules: [
-                    'The Catalyst: Roll the d20 (e.g., rolling a 16 means valid divisors are 1, 2, 4, 8, and 16).',
-                    'Base Metals: Roll the d4, d6, d8, d10, and d12 together.',
-                    'Transmutation: In 5 rounds, combine any two dice using addition, subtraction, multiplication, or division to synthesize new numbers.',
-                    'Every resulting number must cleanly divide the d20 catalyst.',
-                    'Any non-factor remaining at the end becomes Toxic Slag (-3 points).',
-                    'Aim for a Pure Transmutation (0 slag) for Master Alchemist status.'
-                ],
-                tip: 'Look for subtractions that yield 1 or 2 early on—they are universal divisors for any even d20 roll.'
-            },
-            {
-                id: 'wayfarers-compass',
-                title: "Wayfarer's Compass",
-                subtitle: '100 Leagues Wilderness Expedition',
-                category: 'Polyhedral',
-                players: 'Solo (1 Player)',
-                dice: '1d4, 1d6, 1d8, 1d10, 1d20',
-                time: '20 mins',
-                difficulty: 'Medium',
-                summary: 'Travel 100 leagues to the Sanctuary City. Each die governs compass bearings, travel speed, rugged terrain, rations, and wild encounters.',
-                objective: 'Reach 100 leagues before your rations pack runs dry.',
-                equipment: '1d4 (Rations), 1d6 (Terrain), 1d8 (Compass), 1d10 (Distance), 1d20 (Wilds).',
-                rules: [
-                    'Start with 25 Rations and 0 Leagues. Target is 100 Leagues.',
-                    'Each travel day, roll all 5 dice together:',
-                    '• Compass (d8): 1=N, 2=NE, 3=E, 4=SE, 5=S, 6=SW, 7=W, 8=NW. Maintaining NE heading gives +3 bonus leagues.',
-                    '• Distance (d10): Move this many leagues today.',
-                    '• Terrain (d6): 1-2 Plains (normal), 3-4 Bog (distance halved), 5-6 Mountains (costs 1 extra ration).',
-                    '• Rations (d4): Deduct this amount from food reserves.',
-                    '• The Wilds (d20): Roll 1 is Catastrophe (0 leagues today); Roll 19-20 is an Ancient Waystone (+4 rations or +15 leagues).',
-                    'Survive to 100 leagues before rations hit 0 to win!'
-                ],
-                tip: 'Mountain passes are costly on food; pray for plains terrain when distance rolls are high.'
-            },
-            {
-                id: 'dual-strike-20th',
-                title: 'Dual Strike: The 20th Hour',
-                subtitle: 'Asymmetric Colossus vs Swarm Duel',
-                category: 'Polyhedral',
-                players: '2 Players',
-                dice: 'P1: 3d4+2d6 (Swarm) vs P2: 1d20+1d12 (Colossus)',
-                time: '15 mins',
-                difficulty: 'Medium',
-                summary: 'One player commands a monolithic giant with massive d20 strikes, while the other commands a consistent swarm of smaller polyhedrals.',
-                objective: 'Reduce your opponent’s 30 HP vitality pool to zero.',
-                equipment: '3d4, 2d6, 1d12, 1d20, and HP counters (30 each).',
-                rules: [
-                    'Both players roll their respective pools behind a screen, then reveal simultaneously.',
-                    'The Colossus strikes with either their d20 OR d12. It deals damage equal to its face value, but only if higher than the sum of any two Swarm dice!',
-                    'The Swarm constructs defenses: Any matching pair of d4s cancels out the Colossus’s d12 entirely.',
-                    'All unblocked Swarm dice deal their sum directly as piercing damage to the Colossus.',
-                    'Fast, volatile clash of heavy swings against statistical consistency.'
-                ],
-                tip: 'Colossus should play the d12 when the d20 rolls poorly to minimize risk of a complete whiff.'
-            },
-            {
-                id: 'ten-fold-bazaar',
-                title: 'Ten-Fold Bazaar',
-                subtitle: 'Decimal Merchant Speculation',
-                category: 'Polyhedral',
-                players: '2–4 Players',
-                dice: '4d10, 1d6, 1d8',
-                time: '20 mins',
-                difficulty: 'Medium',
-                summary: 'Trade silk, spices, and ore using percentile d10s to set fluctuating market prices. Leverage hidden d8 and d6 dice to outbid rivals.',
-                objective: 'Amass 500 gold through shrewd currency auction bids.',
-                equipment: 'Two percentile d10s, two unit d10s, 1d6, 1d8, and paper.',
-                rules: [
-                    'Each round, roll one percentile d10 and one unit d10 to establish the Commodity Index (01–100 Gold).',
-                    'Merchants secretly roll 1d8 + 1d6 behind their hand as their private trade leverage.',
-                    'Players take turns calling bids to buy or sell cargo lots against the index.',
-                    'Reveal secret dice to either inflate sale prices or undercut purchase costs.',
-                    'Rolling 00 on the percentile d10 triggers a Market Crash, doubling profits for the lowest bidder.',
-                    'First merchant to reach 500 Gold claims the trading charter.'
-                ],
-                tip: 'Keep high d8 leverage concealed until an opponent makes an aggressive buy order.'
-            },
-            {
-                id: 'archons-prism',
-                title: "Archon's Prism",
-                subtitle: 'Light Refraction Color Bands',
-                category: 'Polyhedral',
-                players: '1–3 Players',
-                dice: 'Full Set (d4, d6, d8, d10, d12, d20)',
-                time: '15 mins',
-                difficulty: 'Hard',
-                summary: 'A beam of white light (d20) is refracted into spectrum bands (d4 to d12). Race to harmonize the spectrum dice into exact beam equations.',
-                objective: 'Collect 20 Prism Crystals by solving chromatic arithmetic refractions.',
-                equipment: '1d4, 1d6, 1d8, 1d10, 1d12, 1d20, and scorepad.',
-                rules: [
-                    'Cast the Beam: The lead player rolls the d20 (e.g. 14).',
-                    'Refraction: All players simultaneously roll their spectrum dice: d4 (Violet), d6 (Blue), d8 (Green), d10 (Yellow), and d12 (Red).',
-                    'Players race to build an equation using their rolled values that matches the d20 beam exactly.',
-                    'Harmonic Bonus: If you use all five spectrum dice in a single valid equation, score 10 Prism Crystals immediately!',
-                    'Matching with 3 or 4 dice scores 3 Prism Crystals.',
-                    'First to 20 Prism Crystals is crowned Master Archon.'
-                ],
-                tip: 'Look for d12 + d4 or d10 + d6 combos as quick foundational bases to match common teen d20 rolls.'
-            },
+        <!-- Right Column: Atmospheric Emergency Broadcast Card -->
+        <div class="lg:col-span-5">
+          <div class="card-grit rounded-xl p-6 relative overflow-hidden border-t-4 border-t-crimson-600">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+              <div>
+                <span class="font-mono text-[11px] text-hazard uppercase tracking-widest block">TACTICAL DISPATCH // FLOOR 14</span>
+                <h2 class="font-stencil text-2xl text-white">SECTOR STATUS: OVERRUN</h2>
+              </div>
+              <span class="px-2.5 py-1 rounded bg-crimson-950 border border-crimson-700 font-mono text-xs text-crimson-400 font-bold">
+                5 dB NOISE
+              </span>
+            </div>
 
-            // ==================== 5 ORIGINAL SOLO TITLES ====================
-            {
-                id: 'lanternkeeper',
-                title: 'Lanternkeeper',
-                subtitle: 'Beacon Clearing in the Coastal Fog',
-                category: 'Solo Games',
-                players: 'Solo (1 Player)',
-                dice: '4 Dice (D6)',
-                time: '15 mins',
-                difficulty: 'Medium',
-                summary: 'Split 4 dice into two pairs: one sum to light beacons (1–8), and one difference to manage your oil supply against rolling fog.',
-                objective: 'Light all 8 coastal beacons before your oil flask runs dry.',
-                equipment: '4 standard dice (D6), paper, and pencil.',
-                rules: [
-                    'Draw 8 beacon circles numbered 1 to 8. Track your Oil Flask (starts at 15) and Fog Counter (starts at 0).',
-                    'Each turn, roll all 4 dice. Split them into two pairs: Pair A (Distance/Sum) and Pair B (Oil/Difference).',
-                    'Pair A: Sum the two dice. If it matches an unlit beacon (1–8), light it! If the sum is 9, 10, 11, or 12, add +1 to your Fog Counter.',
-                    'Pair B: Subtract the lower die from the higher die. Deduct that difference from your Oil Flask. If you roll doubles in Pair B, oil cost is 0 and you clear 1 Fog!',
-                    'The Fog Toll: If the Fog Counter ever reaches 3, a heavy mist hits: lose 3 Oil immediately and reset Fog to 0.',
-                    'Victory: Light all 8 beacons while your Oil Flask is still at 1 or more. Remaining oil is your score!'
-                ],
-                tip: 'Look for doubles in Pair B to conserve oil, especially when Pair A can hit difficult high beacons like 7 or 8.'
-            },
-            {
-                id: 'six-stone-garden',
-                title: 'Six-Stone Garden',
-                subtitle: 'The 3×3 Tactile Zen Puzzle',
-                category: 'Solo Games',
-                players: 'Solo (1 Player)',
-                dice: '3 Dice (D6)',
-                time: '12 mins',
-                difficulty: 'Easy',
-                summary: 'Roll 3 dice, choose one stone for your 3×3 grid, and balance lines of straights, triples, parity, and symmetry.',
-                objective: 'Achieve maximum harmony points (24+ pts) across 8 lines.',
-                equipment: '3 dice (D6), pencil, and a 3×3 grid.',
-                rules: [
-                    'Draw a 3×3 grid (9 empty squares). The game lasts 9 rounds until the grid is full.',
-                    'Roll 3 dice each turn. Select exactly one die value to write into any open cell on your board.',
-                    'Discard Rule: If the two unchosen dice form a matching pair, your stone has a hairline fracture: mark a dot on that cell (-2 pts penalty).',
-                    'Scoring (evaluate all 3 rows, 3 columns, and 2 diagonals):',
-                    '• Straight (consecutive numbers, e.g. 2-3-4): +5 pts per line.',
-                    '• Three of a Kind (e.g. 5-5-5): +4 pts per line.',
-                    '• Parity (all three odd or all three even): +3 pts per line.',
-                    '• Symmetry (outer numbers match, e.g. 4-1-4): +2 pts per line.',
-                    'Sum all lines and deduct 2 points per cracked stone.'
-                ],
-                tip: 'Corners participate in three lines each (row, column, diagonal). Prioritize placing versatile values in corner slots.'
-            },
-            {
-                id: 'deep-trench',
-                title: 'Deep Trench: Dive 300',
-                subtitle: 'Submarine Descent & Oxygen Pressure',
-                category: 'Solo Games',
-                players: 'Solo (1 Player)',
-                dice: '5 Dice (D6)',
-                time: '12 mins',
-                difficulty: 'Medium',
-                summary: 'Push your luck down to 300 meters and back. Balance engine movement against life-support leaks and hull pressure cracks.',
-                objective: 'Descend to 300m and safely return to the surface (0m) before Oxygen or Hull collapse.',
-                equipment: '5 dice (D6), paper gauge (0–300m Depth, 20 Oxygen, 3 Hull hearts).',
-                rules: [
-                    'Track Depth (0m), Oxygen (starts at 20), and Hull Integrity (3 hearts).',
-                    'Roll all 5 dice each cycle. Dice results dictate actions:',
-                    '• Engines (2, 4, 6): Move your sub 10 meters per pip in your chosen direction (Descent or Ascent).',
-                    '• Oxygen Scrubber (1): You must spend 1 Oxygen for every 1 rolled.',
-                    '• Pressure Cracks (5): Rolling two or more 5s in a single throw causes 1 Hull damage (♥).',
-                    '• Ballast Vent (3): Choose to either travel 30m OR vent emergency tanks to restore +1 Oxygen.',
-                    'Push-Your-Luck: You may lock up to 2 movement dice and reroll the rest once per turn, but must resolve all newly rolled 1s and 5s!',
-                    'Turn End: Deduct 1 Oxygen simply for breathing. Reach 300m, then resurface to 0m to win.'
-                ],
-                tip: 'Never push your luck rerolling 3 or more dice when your hull is down to 1 heart.'
-            },
-            {
-                id: 'cobblestone-courier',
-                title: 'Cobblestone Courier',
-                subtitle: 'Route Planning & Town Delivery Clock',
-                category: 'Solo Games',
-                players: 'Solo (1 Player)',
-                dice: '4 Dice (D6)',
-                time: '15 mins',
-                difficulty: 'Medium',
-                summary: 'Deliver 5 packages across a diamond town map within a strict 12-hour clock using movement and delivery dice.',
-                objective: 'Deliver all 5 parcels before Hour 12 strikes.',
-                equipment: '4 dice (D6), paper, and pencil.',
-                rules: [
-                    'Draw a diamond map with North Market, South Harbour, East Mill, West Gate, and Central Square.',
-                    'Deliveries needed: North (requires 4+), South (requires 2-), East (requires Even), West (requires Odd), Center (requires any Double).',
-                    'Each turn represents 1 Hour. Roll all 4 dice.',
-                    'Spend dice to move: Center roads cost any die (1–6). Outer rough cobblestone roads require a die showing 3, 4, 5, or 6.',
-                    'Spend remaining unspent dice to make deliveries matching your current hub’s requirement.',
-                    'Advance the clock +1 Hour at the end of each turn. Deliver all 5 packages within 12 hours to win!'
-                ],
-                tip: 'Travel through the Central Square often—it offers cheaper 1-pip movement thresholds to pivot across town.'
-            },
-            {
-                id: 'the-last-hearth',
-                title: 'The Last Hearth',
-                subtitle: 'Blizzard Survival & Ember Engine',
-                category: 'Solo Games',
-                players: 'Solo (1 Player)',
-                dice: '6 Dice (D6)',
-                time: '15 mins',
-                difficulty: 'Hard',
-                summary: 'Survive a 7-day winter gale by managing gale winds, kindling, chopping firewood, and banking glowing embers.',
-                objective: 'Keep the hearth embers burning above 0 through the end of Day 7.',
-                equipment: '6 dice (D6), paper (Embers gauge: starts at 10, max 20; Woodpile: starts at 6 logs).',
-                rules: [
-                    'Each of the 7 Days has three phases:',
-                    '1. The Blizzard Blows: Roll 2 dice. Higher die reduces Embers by that amount (gale wind). Lower die reduces Woodpile logs by that amount (frozen wood), unless Embers are >= 12.',
-                    '2. Worker Dice: Roll the remaining 4 dice. Assign them to actions:',
-                    '• Kindle Fire: Any dice totaling 7 or more adds +4 Embers.',
-                    '• Chop Wood: Any matching pair adds +2 Logs to your woodpile.',
-                    '• Feed Log: Spend 1 Log from woodpile + 1 die to add that die’s face value directly to Embers.',
-                    '3. Bank Fire: If Embers hit 0, the fire dies and you lose. If > 20, excess is lost. Advance to next day.',
-                    'Victory: Survive through Day 7 with the fire still lit!'
-                ],
-                tip: 'Keeping Embers at 12 or above protects your woodpile from freezing storms in Phase 1.'
-            },
+            <!-- Visual Map Teaser -->
+            <div class="bg-abyss/90 border border-slate-800 rounded-lg p-4 mb-5 font-mono text-xs space-y-3">
+              <div class="grid grid-cols-6 gap-1.5 text-center">
+                <div class="h-9 rounded bg-navy-900/90 border border-slate-700 flex items-center justify-center text-slate-400">EXIT</div>
+                <div class="h-9 rounded bg-navy-900/90 border border-slate-700 flex items-center justify-center text-slate-500">⋅</div>
+                <div class="h-9 rounded bg-crimson-950/60 border border-crimson-700/60 flex items-center justify-center text-crimson-400" title="Biomass Infection">☣️</div>
+                <div class="h-9 rounded bg-crimson-950/60 border border-crimson-700/60 flex items-center justify-center text-crimson-400">☣️</div>
+                <div class="h-9 rounded bg-slate-950 border border-slate-900 flex items-center justify-center text-slate-700">?</div>
+                <div class="h-9 rounded bg-slate-950 border border-slate-900 flex items-center justify-center text-slate-700">?</div>
 
-            // ==================== 7 CLASSIC MULTIPLAYER TITLES ====================
-            {
-                id: 'farkle',
-                title: 'Farkle',
-                subtitle: '10,000 / Greed / Zilch',
-                category: 'Push-Your-Luck',
-                players: '2–8 Players',
-                dice: '6 Dice (D6)',
-                time: '25 mins',
-                difficulty: 'Easy',
-                summary: 'Roll 6 dice, bank scoring combinations, and decide whether to risk your turn points on remaining dice.',
-                objective: 'First player to reach 10,000 total banked points.',
-                equipment: '6 dice (D6), paper, and pencil.',
-                rules: [
-                    'Roll all 6 dice. Set aside at least one scoring die (Single 1 = 100, Single 5 = 50, Three of a Kind = Face × 100, with three 1s = 1,000).',
-                    'You may choose to bank your accumulated turn points, or roll the remaining un-scored dice.',
-                    'If a subsequent throw produces zero scoring dice: You Farkle! You forfeit all points gathered on that turn and pass the dice.',
-                    'If you score with all 6 dice ("Hot Dice"), you may pick up all 6 dice and keep racking up points!'
-                ],
-                tip: 'Never push your luck when you are down to just 1 or 2 dice unless you desperately need to catch the leader.'
-            },
-            {
-                id: 'liars-dice',
-                title: "Liar's Dice",
-                subtitle: 'Perudo / Dudo',
-                category: 'Social & Bluffing',
-                players: '2–6 Players',
-                dice: '5 Dice per player + Cups',
-                time: '20 mins',
-                difficulty: 'Medium',
-                summary: 'Secretly roll under your cup and bid on total matching faces across the whole table. Call out bluffs.',
-                objective: 'Outlast everyone else. The last player with dice remaining wins.',
-                equipment: '5 dice and 1 opaque cup per person.',
-                rules: [
-                    'Everyone rolls secretly under their cup. 1s (Aces) are wild.',
-                    'The first player bids on the total quantity of a face across all cups (e.g. "Five 4s").',
-                    'The next player must raise the quantity, raise the face value, or call "Liar!".',
-                    'When Liar is called, all cups lift. If the bidder was wrong, they lose a die. If correct, the challenger loses a die.'
-                ],
-                tip: 'Wild aces double the statistical likelihood of any number. Use early conservative bids to gauge table size.'
-            },
-            {
-                id: 'shut-the-box',
-                title: 'Shut the Box',
-                subtitle: 'Traditional Pub Partition Game',
-                category: 'Classic Strategy',
-                players: '1–4 Players',
-                dice: '2 Dice (D6)',
-                time: '10 mins',
-                difficulty: 'Easy',
-                summary: 'Roll 2 dice and flip down number tiles 1 through 9 matching the roll sum. Aim to shut every tile.',
-                objective: 'Close all numbers 1 to 9. The lowest penalty sum of unclosed tiles wins.',
-                equipment: '2 dice and 1–9 tiles (or paper with numbers 1 to 9 written out).',
-                rules: [
-                    'Roll 2 dice and compute the sum (e.g., 5 + 3 = 8).',
-                    'Flip down any combination of open tiles that sum to 8 (e.g. 8 alone, 7+1, 6+2, 5+3, or 5+2+1).',
-                    'Keep rolling until you cannot make a valid match. Your score for the round is the sum of remaining open numbers.',
-                    'If you close all numbers, you have "Shut the Box" (0 points) for an instant victory!'
-                ],
-                tip: 'Shut high tiles (9, 8, 7) early. Small numbers offer flexible combinations for difficult late-game rolls.'
-            },
-            {
-                id: 'pig',
-                title: 'Pig',
-                subtitle: 'The Timeless Duel of Pure Greed',
-                category: 'Push-Your-Luck',
-                players: '2–10 Players',
-                dice: '1 Die (D6)',
-                time: '15 mins',
-                difficulty: 'Easy',
-                summary: 'A fast-paced contest of pure greed. Roll as many times as you dare to build a pot, but avoid the 1.',
-                objective: 'Be the first player to bank 100 points.',
-                equipment: '1 six-sided die and paper.',
-                rules: [
-                    'On your turn, roll the die repeatedly. 2, 3, 4, 5, and 6 add to your temporary turn pot.',
-                    'You may choose to Bank at any time to add your turn pot to your permanent total score.',
-                    'If you roll a 1, your entire turn pot is wiped to zero and your turn ends immediately.'
-                ],
-                tip: 'Math optimal play suggests banking once your turn pot reaches 20 points, unless the leader is nearing 100.'
-            },
-            {
-                id: 'yahtzee',
-                title: 'Yacht / Yahtzee',
-                subtitle: 'The 1938 Five-Dice Classic',
-                category: 'Classic Strategy',
-                players: '1–6 Players',
-                dice: '5 Dice (D6)',
-                time: '25 mins',
-                difficulty: 'Medium',
-                summary: 'Roll up to 3 times to complete 12 poker-like categories on your scorecard. Rewarding solo or with friends.',
-                objective: 'Score the highest cumulative points across all card slots.',
-                equipment: '5 dice and a scorecard.',
-                rules: [
-                    'Each turn you roll 5 dice and may re-roll any subset up to two additional times.',
-                    'You must enter your score into one unused scorecard box (Ones through Sixes, Full House, Straights, or Yacht).',
-                    'Averaging three of each number in the upper section earns a valuable +35 point bonus.'
-                ],
-                tip: 'Never waste your Chance box early. Keep it as a safety valve for broken late-game straight attempts.'
-            },
-            {
-                id: 'ship-captain-crew',
-                title: 'Ship, Captain & Crew',
-                subtitle: '6-5-4 / Cargo',
-                category: 'Push-Your-Luck',
-                players: '2–8 Players',
-                dice: '5 Dice (D6)',
-                time: '10 mins',
-                difficulty: 'Easy',
-                summary: 'Three rolls to secure your Ship (6), Captain (5), and Crew (4) in exact order, then total your Cargo.',
-                objective: 'Qualify and score the highest Cargo (the remaining 2 dice).',
-                equipment: '5 six-sided dice.',
-                rules: [
-                    'You have up to 3 rolls per turn. You must set aside a 6 (Ship) first.',
-                    'Only once you have a 6 can you keep a 5 (Captain), then a 4 (Crew).',
-                    'Once 6-5-4 are secured, your remaining 2 dice represent your Cargo sum (max 12). Highest cargo takes the round.'
-                ],
-                tip: 'If you roll a 6 and a 5 on your first throw, keep both and use your remaining throws searching for the 4.'
-            },
-            {
-                id: 'cee-lo',
-                title: 'Cee-Lo',
-                subtitle: '4-5-6 / Street & Tavern Dice',
-                category: 'Social & Bluffing',
-                players: '2–6 Players',
-                dice: '3 Dice (D6)',
-                time: '10 mins',
-                difficulty: 'Easy',
-                summary: 'Throw 3 dice into a bowl. Instant win on 4-5-6, instant loss on 1-2-3, or establish a point with pairs.',
-                objective: 'Beat other players with higher combinations.',
-                equipment: '3 dice and a shallow tray or bowl.',
-                rules: [
-                    'Roll all 3 dice. Instant combinations: 4-5-6 (Auto-win), 1-2-3 (Auto-loss), Trips (High automatic win).',
-                    'If you roll a pair, the single remaining die establishes your point (e.g. 2-2-5 gives a point of 5).',
-                    'Keep rolling until an outcome is established, then the next player attempts to beat it.'
-                ],
-                tip: 'Pairs are common (around 44% of throws). A point of 6 is usually very difficult to beat.'
-            }
-        ];
+                <div class="h-9 rounded bg-navy-900/90 border border-slate-700 flex items-center justify-center text-slate-500">⋅</div>
+                <div class="h-9 rounded bg-navy-800 border-2 border-amber-400 flex items-center justify-center text-amber-300 font-bold">YOU</div>
+                <div class="h-9 rounded bg-navy-900/90 border border-cyan-500/50 flex items-center justify-center text-cyan-300" title="Plate Glass Wall">🪟</div>
+                <div class="h-9 rounded bg-crimson-900/80 border border-crimson-500 flex items-center justify-center text-white font-bold animate-pulse">🧟</div>
+                <div class="h-9 rounded bg-slate-950 border border-slate-900 flex items-center justify-center text-slate-700">?</div>
+                <div class="h-9 rounded bg-slate-950 border border-slate-900 flex items-center justify-center text-slate-700">?</div>
+              </div>
+              <p class="text-slate-400 text-[11px] leading-relaxed">
+                <strong class="text-amber-400">FLASHLIGHT CONE:</strong> Your beam only reaches 3 squares into the ruined Pharmacy. Step into the dark to map the back exit—or smash through the drywall with your sledgehammer.
+              </p>
+            </div>
 
-        let audioCtx = null;
-        let isAudioOn = true;
-
-        function getAudioContext() {
-            if (!audioCtx) {
-                const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-                if (AudioCtxClass) audioCtx = new AudioCtxClass();
-            }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            return audioCtx;
-        }
-
-        function toggleAudio() {
-            isAudioOn = !isAudioOn;
-            const label = document.getElementById('audio-label');
-            const icon = document.getElementById('audio-icon');
-            if (isAudioOn) {
-                label.textContent = 'Sound: On';
-                icon.setAttribute('data-lucide', 'volume-2');
-                playDiceClack();
-            } else {
-                label.textContent = 'Sound: Off';
-                icon.setAttribute('data-lucide', 'volume-x');
-            }
-            lucide.createIcons();
-        }
-
-        function playDiceClack() {
-            if (!isAudioOn) return;
-            const ctx = getAudioContext();
-            if (!ctx) return;
-
-            const now = ctx.currentTime;
-            const hits = 3 + Math.floor(Math.random() * 2);
-
-            for (let i = 0; i < hits; i++) {
-                const startTime = now + (i * 0.045) + (Math.random() * 0.02);
-                const bufferSize = ctx.sampleRate * 0.035;
-                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-
-                for (let j = 0; j < bufferSize; j++) {
-                    data[j] = (Math.random() * 2 - 1) * Math.exp(-j / (bufferSize * 0.16));
-                }
-
-                const noise = ctx.createBufferSource();
-                noise.buffer = buffer;
-
-                const filter = ctx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.setValueAtTime(1100 + (Math.random() * 700), startTime);
-                filter.Q.setValueAtTime(5.0, startTime);
-
-                const gain = ctx.createGain();
-                gain.gain.setValueAtTime(0.24, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.035);
-
-                noise.connect(filter);
-                filter.connect(gain);
-                gain.connect(ctx.destination);
-
-                noise.start(startTime);
-            }
-        }
-
-        let rollMode = '5d'; // '5d', '4d', '2d', 'poly'
-        let dice = [];
-        let rollCount = 0;
-        let isRolling = false;
-
-        const diceRackEl = document.getElementById('dice-rack');
-        const traySumEl = document.getElementById('tray-sum');
-        const trayComboEl = document.getElementById('tray-combo-pill');
-        const trayRollsCountEl = document.getElementById('tray-rolls-count');
-
-        function setRollMode(mode) {
-            if (isRolling) return;
-            rollMode = mode;
-            rollCount = 0;
-            trayRollsCountEl.textContent = 'Rolls: 0';
-
-            const btn5 = document.getElementById('mode-5d-btn');
-            const btn4 = document.getElementById('mode-4d-btn');
-            const btn2 = document.getElementById('mode-2d-btn');
-            const btnPoly = document.getElementById('mode-poly-btn');
-
-            [btn5, btn4, btn2, btnPoly].forEach(b => {
-                b.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition';
-            });
-
-            if (mode === '5d') {
-                btn5.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg bg-coral text-white font-bold transition shadow-sm';
-                dice = [
-                    { val: 1, sides: 6, held: false },
-                    { val: 2, sides: 6, held: false },
-                    { val: 3, sides: 6, held: false },
-                    { val: 4, sides: 6, held: false },
-                    { val: 5, sides: 6, held: false }
-                ];
-            } else if (mode === '4d') {
-                btn4.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg bg-coral text-white font-bold transition shadow-sm';
-                dice = [
-                    { val: 2, sides: 6, held: false },
-                    { val: 3, sides: 6, held: false },
-                    { val: 4, sides: 6, held: false },
-                    { val: 5, sides: 6, held: false }
-                ];
-            } else if (mode === '2d') {
-                btn2.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg bg-coral text-white font-bold transition shadow-sm';
-                dice = [
-                    { val: 3, sides: 6, held: false },
-                    { val: 4, sides: 6, held: false }
-                ];
-            } else if (mode === 'poly') {
-                btnPoly.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold transition shadow-sm flex items-center gap-1';
-                dice = [
-                    { val: 4, sides: 4, label: 'd4', held: false },
-                    { val: 6, sides: 6, label: 'd6', held: false },
-                    { val: 8, sides: 8, label: 'd8', held: false },
-                    { val: 10, sides: 10, label: 'd10', held: false },
-                    { val: 12, sides: 12, label: 'd12', held: false },
-                    { val: 20, sides: 20, label: 'd20', held: false }
-                ];
-            }
-
-            renderDice();
-            evaluateHand();
-        }
-
-        function getPipMarkup(val) {
-            const positions = {
-                1: ['center'],
-                2: ['tl', 'br'],
-                3: ['tl', 'center', 'br'],
-                4: ['tl', 'tr', 'bl', 'br'],
-                5: ['tl', 'tr', 'center', 'bl', 'br'],
-                6: ['tl', 'tr', 'ml', 'mr', 'bl', 'br']
-            }[val] || ['center'];
-
-            return `
-                <div class="w-full h-full p-2 sm:p-2.5 grid grid-cols-3 grid-rows-3 items-center justify-items-center">
-                    ${positions.map(p => {
-                        let c = '';
-                        if (p === 'tl') c = 'col-start-1 row-start-1';
-                        if (p === 'tr') c = 'col-start-3 row-start-1';
-                        if (p === 'ml') c = 'col-start-1 row-start-2';
-                        if (p === 'center') c = 'col-start-2 row-start-2';
-                        if (p === 'mr') c = 'col-start-3 row-start-2';
-                        if (p === 'bl') c = 'col-start-1 row-start-3';
-                        if (p === 'br') c = 'col-start-3 row-start-3';
-                        return `<span class="pip ${val === 1 ? 'pip-accent' : ''} ${c}"></span>`;
-                    }).join('')}
+            <!-- Dice Pool Preview -->
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-slate-400">YOUR STAMINA POOL (4D6)</span>
+                <span class="text-crimson-400">1 DIE EXHAUSTED</span>
+              </div>
+              <div class="grid grid-cols-4 gap-2.5 pt-1">
+                <div class="p-2.5 rounded bg-crimson-950/80 border border-crimson-600 text-center">
+                  <span class="font-stencil text-2xl text-white block">6</span>
+                  <span class="font-mono text-[10px] text-crimson-300 uppercase">⚔️ CRIT</span>
                 </div>
-            `;
-        }
+                <div class="p-2.5 rounded bg-crimson-950/80 border border-crimson-600 text-center">
+                  <span class="font-stencil text-2xl text-white block">4</span>
+                  <span class="font-mono text-[10px] text-crimson-300 uppercase">⚔️ HIT</span>
+                </div>
+                <div class="p-2.5 rounded bg-navy-800 border border-blue-500 text-center">
+                  <span class="font-stencil text-2xl text-blue-200 block">🛡️</span>
+                  <span class="font-mono text-[10px] text-blue-300 uppercase">GUARD</span>
+                </div>
+                <div class="p-2.5 rounded bg-slate-900 border border-slate-700 opacity-50 text-center">
+                  <span class="font-stencil text-2xl text-slate-500 block">1</span>
+                  <span class="font-mono text-[10px] text-slate-500 uppercase">LOCKED</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        function renderDice() {
-            diceRackEl.innerHTML = '';
-            dice.forEach((die, index) => {
-                const el = document.createElement('div');
-                const isHeld = die.held;
+      </div>
+    </div>
+  </header>
 
-                if (rollMode === 'poly') {
-                    // Polyhedral Die Card
-                    el.className = `die-box w-16 sm:w-20 aspect-square rounded-2xl cursor-pointer relative bg-white border-2 flex flex-col items-center justify-between p-2 shadow-die ${
-                        isHeld ? 'border-coral shadow-die-held scale-105' : 'border-surface-muted hover:border-slate-300'
-                    }`;
+  <!-- THREE PILLARS OF SURVIVAL (WHY IT FEELS DIFFERENT) -->
+  <section id="pitch" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="max-w-3xl mb-14">
+        <span class="font-mono text-xs uppercase tracking-widest text-crimson-500 font-bold">SURVIVAL HORROR ON GRAPH PAPER</span>
+        <h2 class="font-stencil text-3xl sm:text-5xl text-white mt-2">YOUR MAP IS ALIVE. YOUR DICE ARE TIRING.</h2>
+        <p class="text-slate-400 mt-3 text-lg">
+          In classic dungeon crawlers, rooms sit quietly waiting for you to open the door. In <strong class="text-white">Dead Sector</strong>, every decision echoes two rooms ahead.
+        </p>
+      </div>
 
-                    el.innerHTML = `
-                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">${die.label}</span>
-                        <span class="font-display font-black text-2xl sm:text-3xl text-midnight-900 leading-none my-auto ${die.val === die.sides ? 'text-coral' : ''}">${die.val}</span>
-                        <span class="text-[9px] font-mono text-slate-400">1–${die.sides}</span>
-                    `;
-                } else {
-                    // Standard D6 Cube
-                    el.className = `die-box w-16 sm:w-20 aspect-square rounded-2xl cursor-pointer relative bg-white border-2 ${
-                        isHeld ? 'border-coral shadow-die-held scale-105' : 'border-surface-muted shadow-die hover:border-slate-300'
-                    }`;
-                    el.innerHTML = getPipMarkup(die.val);
-                }
+      <div class="grid md:grid-cols-3 gap-7">
+        <!-- Pillar 1 -->
+        <div class="card-grit rounded-xl p-7 flex flex-col justify-between hover:border-crimson-600/60 transition">
+          <div>
+            <div class="w-12 h-12 rounded-lg bg-crimson-950 border border-crimson-700 flex items-center justify-center text-2xl mb-5">
+              🫁
+            </div>
+            <span class="font-mono text-xs text-crimson-400 uppercase tracking-wider">Pillar 01 // The Core Engine</span>
+            <h3 class="font-stencil text-2xl text-white mt-1 mb-3">THE BREATHING STAMINA POOL</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Your D6 pool is both your fury and your shield. Every round, split your dice between violent <strong class="text-white">Attacks</strong> and unrolled <strong class="text-white">Guards</strong>. Swing with everything to drop a Screamer before it shrieks—or play it safe so a Sprinter doesn't tear your throat out. Roll a <strong class="text-crimson-400">1</strong>, and that die locks up from exhaustion.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800/80 font-mono text-xs text-slate-400">
+            "Do I spend my last Grit to reroll that 1, or save it for the Riot Zombie down the hall?"
+          </div>
+        </div>
 
-                if (isHeld) {
-                    const tag = document.createElement('span');
-                    tag.className = 'absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-coral text-white font-mono text-[9px] font-bold uppercase tracking-wider shadow-sm';
-                    tag.textContent = 'Held';
-                    el.appendChild(tag);
-                }
+        <!-- Pillar 2 -->
+        <div class="card-grit rounded-xl p-7 flex flex-col justify-between hover:border-amber-500/60 transition">
+          <div>
+            <div class="w-12 h-12 rounded-lg bg-amber-950/60 border border-amber-600/60 flex items-center justify-center text-2xl mb-5">
+              📢
+            </div>
+            <span class="font-mono text-xs text-amber-400 uppercase tracking-wider">Pillar 02 // Dynamic Map Decay</span>
+            <h3 class="font-stencil text-2xl text-white mt-1 mb-3">DECIBELS & DARKNESS</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Fire a shotgun or pry open a security gate with a crowbar, and your <strong class="text-white">Decibel Tracker</strong> climbs. You add your current Noise level directly to your room-generation rolls—meaning the loud gunfight you survived in the Lobby literally draws swarms, blown-in windows, and fire into the rooms ahead.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800/80 font-mono text-xs text-slate-400">
+            Power out? Roll 2D6: the lower die is how far your flashlight beam reaches into the dark.
+          </div>
+        </div>
 
-                el.onclick = () => toggleHold(index);
-                diceRackEl.appendChild(el);
-            });
-        }
+        <!-- Pillar 3 -->
+        <div class="card-grit rounded-xl p-7 flex flex-col justify-between hover:border-blue-500/60 transition">
+          <div>
+            <div class="w-12 h-12 rounded-lg bg-navy-800 border border-blue-600/60 flex items-center justify-center text-2xl mb-5">
+              🪟
+            </div>
+            <span class="font-mono text-xs text-blue-400 uppercase tracking-wider">Pillar 03 // Modern Architecture</span>
+            <h3 class="font-stencil text-2xl text-white mt-1 mb-3">GLASS, DRYWALL & BIOMASS</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Peek through <strong class="text-white">Plate-Glass Storefronts</strong> to map the loot and undead inside before entering—just remember that fighting in the hallway will shatter the glass and pull them out. Cornered by spreading biomass? Spend a Sledgehammer point to draw your own exit straight through the drywall.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800/80 font-mono text-xs text-slate-400">
+            Lock doors and draw barricades behind you so your extraction route doesn't become a tomb.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        function toggleHold(index) {
-            if (isRolling) return;
-            dice[index].held = !dice[index].held;
-            renderDice();
-            evaluateHand();
-        }
+  <!-- THE FOUR QUARANTINE TAPES (CAMPAIGN SETTINGS) -->
+  <section id="zones" class="py-20 bg-navy-950/60 border-b border-slate-800/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-widest text-amber-400 font-bold">4 STANDALONE SCENARIO TAPES</span>
+          <h2 class="font-stencil text-3xl sm:text-5xl text-white mt-2">CHOOSE YOUR SLAUGHTERHOUSE</h2>
+        </div>
+        <p class="text-slate-400 max-w-md text-sm">
+          Each setting uses the same 2D6 split-dice engine to transform your graph paper into a completely different survival nightmare.
+        </p>
+      </div>
 
-        function executeRoll() {
-            if (isRolling) return;
+      <div class="grid sm:grid-cols-2 gap-6">
+        <!-- Setting 1 -->
+        <div class="card-grit rounded-xl p-6 border-l-4 border-l-blue-500">
+          <div class="flex justify-between items-start mb-3">
+            <span class="font-mono text-xs px-2.5 py-1 rounded bg-blue-950 text-blue-300 border border-blue-800">TAPE 01 // VERTICAL BREACH</span>
+            <span class="font-mono text-xs text-slate-400">Difficulty: ★★☆</span>
+          </div>
+          <h3 class="font-stencil text-2xl text-white mb-2">THE DEAD MEGAMALL & HIGH-RISE</h3>
+          <p class="text-slate-300 text-sm leading-relaxed mb-4">
+            Ascend a 40-story quarantine tower or cross a sprawling dead mall to reach rooftop evac. Features plate-glass storefronts, security shutters, pharmacy loot runs, and atrium escalators.
+          </p>
+          <div class="font-mono text-xs text-blue-300 bg-abyss/70 p-3 rounded border border-slate-800">
+            <strong>Signature Rule:</strong> Split-Dice Blueprints (Die 1 draws room footprint; Die 2 spawns storefront purpose & loot).
+          </div>
+        </div>
 
-            if (dice.every(d => d.held)) {
-                dice.forEach(d => d.held = false);
-            }
+        <!-- Setting 2 -->
+        <div class="card-grit rounded-xl p-6 border-l-4 border-l-amber-500">
+          <div class="flex justify-between items-start mb-3">
+            <span class="font-mono text-xs px-2.5 py-1 rounded bg-amber-950/80 text-amber-300 border border-amber-800">TAPE 02 // THE GRIDLOCK</span>
+            <span class="font-mono text-xs text-slate-400">Difficulty: ★★★</span>
+          </div>
+          <h3 class="font-stencil text-2xl text-white mb-2">HIGHWAY OVERPASS MILE 14</h3>
+          <p class="text-slate-300 text-sm leading-relaxed mb-4">
+            A six-lane highway overpass choked with jackknifed 18-wheelers, FEMA tents, and military blockades with a sheer drop on both sides. Squeeze between bumpers or breach the back of an ambulance for meds.
+          </p>
+          <div class="font-mono text-xs text-amber-300 bg-abyss/70 p-3 rounded border border-slate-800">
+            <strong>Signature Rule:</strong> Shifting Walls — rolling doubles on an encounter pushes vehicle clusters down the page under the weight of the horde.
+          </div>
+        </div>
 
-            isRolling = true;
-            rollCount++;
-            trayRollsCountEl.textContent = `Rolls: ${rollCount}`;
-            playDiceClack();
+        <!-- Setting 3 -->
+        <div class="card-grit rounded-xl p-6 border-l-4 border-l-crimson-600">
+          <div class="flex justify-between items-start mb-3">
+            <span class="font-mono text-xs px-2.5 py-1 rounded bg-crimson-950 text-crimson-300 border border-crimson-800">TAPE 03 // TOTAL BLACKOUT</span>
+            <span class="font-mono text-xs text-slate-400">Difficulty: ★★★</span>
+          </div>
+          <h3 class="font-stencil text-2xl text-white mb-2">SUB-BASEMENT GENERATOR RUN</h3>
+          <p class="text-slate-300 text-sm leading-relaxed mb-4">
+            The grid has failed. Navigate pitch-black maintenance tunnels where your flashlight beam only reveals the front half of any room you open. Step into the unmapped dark to find the exits.
+          </p>
+          <div class="font-mono text-xs text-crimson-300 bg-abyss/70 p-3 rounded border border-slate-800">
+            <strong>Signature Rule:</strong> Flashlight Cones & Noise Amplification — gunshots echo in concrete tunnels (+2 Decibels per shot).
+          </div>
+        </div>
 
-            const elements = diceRackEl.querySelectorAll('.die-box');
-            dice.forEach((d, idx) => {
-                if (!d.held && elements[idx]) {
-                    elements[idx].classList.add('rolling');
-                }
-            });
+        <!-- Setting 4 -->
+        <div class="card-grit rounded-xl p-6 border-l-4 border-l-emerald-500">
+          <div class="flex justify-between items-start mb-3">
+            <span class="font-mono text-xs px-2.5 py-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">TAPE 04 // INFECTION VECTOR</span>
+            <span class="font-mono text-xs text-slate-400">Difficulty: ★★★★</span>
+          </div>
+          <h3 class="font-stencil text-2xl text-white mb-2">CDC BIO-LAB CONTAINMENT</h3>
+          <p class="text-slate-300 text-sm leading-relaxed mb-4">
+            Grab the antiviral samples on Sub-Level 3 and make it back to the airlock alive. Rolling doubles shades the room in living biomass that creeps through open doorways into cleared rooms every turn milestone.
+          </p>
+          <div class="font-mono text-xs text-emerald-300 bg-abyss/70 p-3 rounded border border-slate-800">
+            <strong>Signature Rule:</strong> The Tethered Escape — weld doors shut and draw barricades on your way in, or your return trip becomes a death trap.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-            let ticks = 0;
-            const timer = setInterval(() => {
-                dice.forEach(d => {
-                    if (!d.held) {
-                        d.val = Math.floor(Math.random() * d.sides) + 1;
-                    }
-                });
-                renderDice();
-                ticks++;
-                if (ticks > 6) {
-                    clearInterval(timer);
-                    isRolling = false;
-                    evaluateHand();
-                }
-            }, 60);
-        }
+  <!-- INTERACTIVE PLAYABLE ENCOUNTER ("TRY A TURN RIGHT NOW") -->
+  <section id="demo" class="py-20 border-b border-slate-800/80 relative">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-10 gap-4">
+        <div>
+          <span class="font-mono text-xs uppercase tracking-widest text-amber-400 font-bold">INTERACTIVE TACTICAL DEMO</span>
+          <h2 class="font-stencil text-3xl sm:text-5xl text-white mt-1">TEST YOUR NERVE: BREACH & SURVIVE</h2>
+          <p class="text-slate-400 mt-2 max-w-2xl">
+            Experience how the 2D6 Room Breach and Stamina Pool combat lock together. Map a new storefront, watch your Decibel level, and allocate your dice between Attack and Guard.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="loadPreset('pharmacy')" class="px-3.5 py-2 rounded bg-crimson-900/60 hover:bg-crimson-700 border border-crimson-500/60 text-xs font-mono text-white transition">
+            Load "Pharmacy Sprinter" Scenario
+          </button>
+          <button onclick="resetDemo()" class="px-3.5 py-2 rounded bg-navy-900 hover:bg-navy-800 border border-slate-700 text-xs font-mono text-slate-300 transition">
+            Reset Run
+          </button>
+        </div>
+      </div>
 
-        function resetDiceTray() {
-            dice.forEach(d => d.held = false);
-            rollCount = 0;
-            trayRollsCountEl.textContent = 'Rolls: 0';
-            renderDice();
-            evaluateHand();
-        }
+      <div class="grid lg:grid-cols-12 gap-8">
+        
+        <!-- Left: 2D6 Blueprint & Noise Scanner (5 cols) -->
+        <div class="lg:col-span-5 card-grit rounded-xl p-6 flex flex-col justify-between border-t-4 border-t-blue-600">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+              <div>
+                <span class="font-mono text-[10px] text-blue-400 uppercase tracking-widest block">STEP 1 // 2D6 BLUEPRINT BREACH</span>
+                <h3 id="roomTitle" class="font-stencil text-xl text-white">3x5 PHARMACY STOREFRONT</h3>
+              </div>
+              <div class="text-right">
+                <span class="font-mono text-[10px] text-slate-400 block">NOISE LEVEL</span>
+                <span id="dbBadge" class="font-mono text-sm font-bold text-amber-400">2 / 6 dB</span>
+              </div>
+            </div>
 
-        function evaluateHand() {
-            const values = dice.map(d => d.val);
-            const sum = values.reduce((a, b) => a + b, 0);
-            traySumEl.textContent = sum;
+            <!-- Noise Meter Visual -->
+            <div class="mb-4">
+              <div class="grid grid-cols-6 gap-1.5" id="dbBars"></div>
+              <div class="flex justify-between font-mono text-[10px] text-slate-500 mt-1">
+                <span>SILENT (0 dB)</span>
+                <span>SWARM ALERT (6 dB)</span>
+              </div>
+            </div>
 
-            if (rollMode === 'poly') {
-                const maxVal = Math.max(...values);
-                const hasD20Nat20 = dice.find(d => d.sides === 20 && d.val === 20);
+            <!-- Mini 6x6 Blueprint Grid -->
+            <div class="bg-abyss border border-slate-800 rounded-lg p-3 mb-4">
+              <div class="flex justify-between items-center mb-2 font-mono text-[11px]">
+                <span id="roomCoords" class="text-blue-300">Footprint: 3x5 Grid</span>
+                <label class="flex items-center gap-1.5 text-amber-400 cursor-pointer">
+                  <input type="checkbox" id="flashlightToggle" onchange="renderGrid()" class="rounded bg-slate-900 border-slate-700 text-amber-500">
+                  <span>Flashlight Outage</span>
+                </label>
+              </div>
+              <div id="blueprintGrid" class="grid grid-cols-6 gap-1 aspect-square max-w-[250px] mx-auto"></div>
+              <p id="roomTraitText" class="font-mono text-[11px] text-slate-400 mt-3 text-center">
+                D1 [3] Storefront + D2 [3] Pharmacy: Meds available, high risk of fast infected.
+              </p>
+            </div>
+          </div>
 
-                if (hasD20Nat20) {
-                    trayComboEl.className = 'px-3.5 py-1.5 rounded-full bg-coral text-white border-transparent font-bold';
-                    trayComboEl.textContent = 'Natural 20! Critical Hit!';
-                    if (typeof confetti === 'function') {
-                        confetti({ particleCount: 75, spread: 65, origin: { y: 0.6 } });
-                    }
-                } else if (values.every((v, i, arr) => !i || arr[i - 1] < v)) {
-                    trayComboEl.className = 'px-3.5 py-1.5 rounded-full bg-teal text-white border-transparent font-bold';
-                    trayComboEl.textContent = 'Perfect Cascade! (Ascending)';
-                } else {
-                    trayComboEl.className = 'px-3.5 py-1.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-bold';
-                    trayComboEl.textContent = `High Die: ${maxVal} • Sum: ${sum}`;
-                }
-                return;
-            }
+          <div class="space-y-2.5">
+            <button onclick="breachNextRoom()" class="w-full py-3 rounded-lg bg-blue-700 hover:bg-blue-600 text-white font-stencil tracking-wider text-base transition shadow-lg shadow-blue-950/60">
+              🎲 ROLL 2D6: BREACH NEXT ROOM
+            </button>
+            <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+              <button onclick="peekGlass()" class="py-2 px-3 rounded bg-navy-900 hover:bg-navy-800 border border-slate-700 text-cyan-300 transition">
+                🪟 Peek Glass Door
+              </button>
+              <button onclick="smashDrywall()" class="py-2 px-3 rounded bg-navy-900 hover:bg-navy-800 border border-slate-700 text-amber-300 transition">
+                🔨 Smash Drywall (+1 dB)
+              </button>
+            </div>
+          </div>
+        </div>
 
-            if (rollMode === '2d') {
-                if (values[0] === values[1]) {
-                    trayComboEl.className = 'px-3.5 py-1.5 rounded-full bg-coral/20 text-coral border border-coral/30 font-bold';
-                    trayComboEl.textContent = `Double ${values[0]}s!`;
-                } else if (sum === 7) {
-                    trayComboEl.className = 'px-3.5 py-1.5 rounded-full bg-amber/20 text-amber border border-amber/30 font-bold';
-                    trayComboEl.textContent = 'Seven (The Peak)';
-                } else {
-                    trayComboEl.className = 'px-3.5 py-1.5 rounded-full bg-midnight-850 text-slate-300 border border-midnight-700 font-medium';
-                    trayComboEl.textContent = `Pair sum: ${sum}`;
-                }
-                return;
-            }
+        <!-- Right: Stamina Pool Combat Engine (7 cols) -->
+        <div class="lg:col-span-7 card-grit rounded-xl p-6 flex flex-col justify-between border-t-4 border-t-crimson-600">
+          <div>
+            <!-- Survivor & Loadout Header -->
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-5">
+              <div class="flex items-center gap-3">
+                <select id="weaponSelect" onchange="changeLoadout()" class="bg-navy-900 border border-slate-700 rounded px-3 py-1.5 font-mono text-xs text-white">
+                  <option value="bladed" selected>🪓 Fire Axe (Hit 4+ | 2 Dmg | 6=3 Dmg, 1=Stuck)</option>
+                  <option value="blunt">🏏 Crowbar (Hit 4+ | 1 Dmg | 6=Stun -2 Dmg)</option>
+                  <option value="agile">🔪 Combat Knife (Hit 3+ | 1 Dmg | R1 Safe 1s)</option>
+                  <option value="firearm">🔫 9mm Pistol (Hit 3+ | 3 Dmg | +1 dB Noise)</option>
+                </select>
+                <select id="zombieSelect" onchange="changeZombie()" class="bg-crimson-950/70 border border-crimson-700/70 rounded px-3 py-1.5 font-mono text-xs text-crimson-200">
+                  <option value="sprinter" selected>⚡ Sprinter (3 HP | 3 Dmg | Hits on 5–6)</option>
+                  <option value="shambler">🧟 Shambler (4 HP | 2 Dmg | Relentless Grab)</option>
+                  <option value="riot">🛡️ Riot-Gear (8 HP | 2 Dmg | Armor -1 & 6 to Kill)</option>
+                  <option value="bloater">☣️ Bloater (6 HP | 1 Dmg | 1s Deal Spore Dmg)</option>
+                  <option value="screamer">📢 Screamer (2 HP | 1 Dmg | Calls Horde on 5–6)</option>
+                </select>
+              </div>
 
-            // D6 Combinations Evaluator
-            const counts = {};
-            values.forEach(v => counts[v] = (counts[v] || 0) + 1);
-            const unique = [...new Set(values)].sort().join('');
-
-            let comboName = 'High Dice';
-            let comboColor = 'bg-midnight-850 text-slate-300 border-midnight-700';
-
-            if (Object.values(counts).includes(5)) {
-                comboName = 'Five of a Kind (Yacht!)';
-                comboColor = 'bg-coral text-white border-transparent';
-                if (typeof confetti === 'function') {
-                    confetti({ particleCount: 75, spread: 65, origin: { y: 0.6 } });
-                }
-            } else if (Object.values(counts).includes(4)) {
-                comboName = 'Four of a Kind';
-                comboColor = 'bg-coral/20 text-coral border-coral/30';
-            } else if (Object.values(counts).includes(3) && Object.values(counts).includes(2)) {
-                comboName = 'Full House';
-                comboColor = 'bg-teal/20 text-teal border-teal/30';
-            } else if (unique === '12345' || unique === '23456') {
-                comboName = 'Large Straight';
-                comboColor = 'bg-teal/20 text-teal border-teal/30';
-            } else if (unique.includes('1234') || unique.includes('2345') || unique.includes('3456')) {
-                comboName = 'Small Straight';
-                comboColor = 'bg-amber/20 text-amber border-amber/30';
-            } else if (Object.values(counts).includes(3)) {
-                comboName = 'Three of a Kind';
-                comboColor = 'bg-midnight-800 text-slate-200 border-midnight-700';
-            }
-
-            trayComboEl.className = `px-3.5 py-1.5 rounded-full border font-bold ${comboColor}`;
-            trayComboEl.textContent = comboName;
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-                e.preventDefault();
-                executeRoll();
-            }
-        });
-
-        const gamesGridEl = document.getElementById('games-grid');
-        let activeCategory = 'All';
-        let searchQuery = '';
-
-        function renderGames() {
-            gamesGridEl.innerHTML = '';
-            
-            const filtered = GAMES.filter(g => {
-                const matchesCat = (activeCategory === 'All' || g.category === activeCategory);
-                const matchesQuery = searchQuery === '' || 
-                    g.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                    g.dice.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    g.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    g.category.toLowerCase().includes(searchQuery.toLowerCase());
-                return matchesCat && matchesQuery;
-            });
-
-            if (filtered.length === 0) {
-                gamesGridEl.innerHTML = `
-                    <div class="col-span-full py-12 text-center text-slate-500 text-sm">
-                        No dice games found matching your search. Try searching for "Polyhedral", "Solo", or "D20".
-                    </div>
-                `;
-                return;
-            }
-
-            filtered.forEach(game => {
-                const card = document.createElement('div');
-                card.className = 'group bg-white rounded-3xl p-6 border border-surface-border hover:border-midnight-700 hover:shadow-card transition-all cursor-pointer flex flex-col justify-between';
-                card.onclick = () => openGameModal(game.id);
-
-                let badgeColor = 'bg-midnight-900 text-white';
-                if (game.category === 'Polyhedral') badgeColor = 'bg-indigo-50 text-indigo-700 border border-indigo-200';
-                else if (game.category === 'Solo Games') badgeColor = 'bg-teal-light text-teal border border-teal/20';
-                else if (game.category === 'Push-Your-Luck') badgeColor = 'bg-coral-light text-coral';
-                else if (game.category === 'Social & Bluffing') badgeColor = 'bg-amber-light text-amber-900';
-
-                card.innerHTML = `
-                    <div>
-                        <div class="flex items-center justify-between gap-2 mb-3">
-                            <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500">${game.dice}</span>
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${badgeColor}">${game.category}</span>
-                        </div>
-                        <h3 class="font-display font-bold text-xl text-midnight-900 group-hover:text-coral transition-colors">${game.title}</h3>
-                        <p class="text-xs text-slate-400 font-medium mb-3">${game.subtitle}</p>
-                        <p class="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 font-normal">${game.summary}</p>
-                    </div>
-                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
-                        <span>${game.players}</span>
-                        <span class="text-midnight-900 font-bold group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                            Read Rules &rarr;
-                        </span>
-                    </div>
-                `;
-
-                gamesGridEl.appendChild(card);
-            });
-        }
-
-        function filterCategory(cat) {
-            activeCategory = cat;
-            document.querySelectorAll('.cat-pill').forEach(btn => {
-                if (btn.textContent.includes(cat) || (cat === 'All' && btn.textContent.includes('All'))) {
-                    btn.className = 'cat-pill active px-4 py-2 rounded-xl text-xs font-bold bg-midnight-900 text-white shadow transition';
-                } else {
-                    btn.className = 'cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-700 border border-surface-border hover:border-midnight-800 transition';
-                }
-            });
-            renderGames();
-        }
-
-        function handleSearch() {
-            searchQuery = document.getElementById('game-search').value.trim();
-            renderGames();
-        }
-
-        function pickRandomGame() {
-            const random = GAMES[Math.floor(Math.random() * GAMES.length)];
-            openGameModal(random.id);
-        }
-
-        // Rules Modal Logic
-        const modalEl = document.getElementById('rules-modal');
-        const modalBodyEl = document.getElementById('modal-body');
-
-        function openGameModal(gameId) {
-            const g = GAMES.find(x => x.id === gameId);
-            if (!g) return;
-
-            modalBodyEl.innerHTML = `
+              <div class="flex items-center gap-4 font-mono text-xs">
                 <div>
-                    <div class="flex items-center gap-2 mb-2 flex-wrap">
-                        <span class="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-midnight-900 text-white">${g.category}</span>
-                        <span class="text-xs text-slate-400">•</span>
-                        <span class="text-xs font-semibold text-slate-600">${g.dice}</span>
-                        <span class="text-xs text-slate-400">•</span>
-                        <span class="text-xs font-semibold text-slate-600">${g.time}</span>
-                        <span class="text-xs text-slate-400">•</span>
-                        <span class="text-xs font-semibold text-slate-600">${g.players}</span>
-                    </div>
-                    <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-midnight-900">${g.title}</h2>
-                    <p class="text-xs text-slate-400 font-medium mt-0.5">${g.subtitle}</p>
-
-                    <div class="mt-5 p-3.5 rounded-2xl bg-surface-bg border border-surface-border text-xs text-slate-700 space-y-1.5">
-                        <div><strong class="font-bold text-midnight-900">Objective:</strong> ${g.objective}</div>
-                        <div><strong class="font-bold text-midnight-900">Equipment:</strong> ${g.equipment}</div>
-                    </div>
-
-                    <div class="mt-6 space-y-4 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                        <h4 class="font-display font-bold text-midnight-900 text-sm">Rules &amp; Sequence of Play</h4>
-                        <ol class="list-decimal pl-5 space-y-2 text-slate-600">
-                            ${g.rules.map(r => `<li>${r}</li>`).join('')}
-                        </ol>
-                    </div>
-
-                    <div class="mt-6 p-4 rounded-2xl bg-coral-light border border-coral/20 text-xs text-slate-800">
-                        <strong class="text-coral font-bold block mb-0.5">Quick Tactical Tip:</strong>
-                        ${g.tip}
-                    </div>
-
-                    <div class="mt-8 pt-4 border-t border-slate-200 flex items-center justify-between text-xs">
-                        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-surface-bg hover:bg-slate-200 text-slate-700 font-semibold transition flex items-center gap-1.5">
-                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                            Print Rule Sheet
-                        </button>
-                        <button onclick="closeRulesModal()" class="px-5 py-2 rounded-xl bg-midnight-900 hover:bg-midnight-800 text-white font-bold transition">
-                            Done
-                        </button>
-                    </div>
+                  <span class="text-slate-400">HP:</span>
+                  <span id="playerHpText" class="text-emerald-400 font-bold">10/10</span>
                 </div>
-            `;
+                <div>
+                  <span class="text-slate-400">GRIT:</span>
+                  <span id="playerGritText" class="text-amber-400 font-bold">1</span>
+                </div>
+                <div>
+                  <span class="text-slate-400">ROUND:</span>
+                  <span id="roundText" class="text-white font-bold">1</span>
+                </div>
+              </div>
+            </div>
 
-            lucide.createIcons();
-            modalEl.classList.remove('hidden');
-        }
+            <!-- Active Threat Card -->
+            <div class="bg-crimson-950/30 border border-crimson-800/60 rounded-lg p-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span id="zombieName" class="font-stencil text-2xl text-white">SPRINTER</span>
+                  <span id="zombieStatsBadge" class="font-mono text-xs px-2 py-0.5 rounded bg-crimson-900/80 text-crimson-200">Bite: 3 Dmg</span>
+                </div>
+                <p id="zombieTraitDesc" class="text-xs text-slate-300 mt-1">
+                  <strong>Blur of Speed:</strong> Melee attacks only hit on 5 or 6 (Firearms hit on 3+).
+                </p>
+              </div>
+              <div class="sm:text-right min-w-[130px]">
+                <div class="font-mono text-xs text-crimson-300 mb-1">ZOMBIE HP: <span id="zombieHpText" class="font-bold text-white">3 / 3</span></div>
+                <div class="w-full h-2.5 bg-abyss rounded-full overflow-hidden border border-crimson-900">
+                  <div id="zombieHpBar" class="h-full bg-crimson-600 transition-all duration-300" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
 
-        function closeRulesModal() {
-            modalEl.classList.add('hidden');
-        }
+            <!-- Interactive Stamina Dice Tray -->
+            <div class="mb-5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-mono text-xs text-slate-300 uppercase tracking-wider">
+                  STEP 2 // CLICK DICE TO TOGGLE <span class="text-crimson-400 font-bold">ATTACK (⚔️)</span> OR <span class="text-blue-400 font-bold">GUARD (🛡️)</span>
+                </span>
+                <button onclick="addPoolDie()" class="font-mono text-[11px] text-blue-400 hover:underline">+ Level Up Pool (Max 6D6)</button>
+              </div>
 
-        modalEl.addEventListener('click', (e) => {
-            if (e.target === modalEl) closeRulesModal();
-        });
+              <div id="diceContainer" class="grid grid-cols-3 sm:grid-cols-6 gap-3 my-3"></div>
+            </div>
+          </div>
 
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeRulesModal();
-        });
+          <!-- Action Controls & Combat Log -->
+          <div class="space-y-3">
+            <div class="flex flex-wrap gap-2.5">
+              <button id="rollAttackBtn" onclick="rollCombatTurn()" class="flex-1 py-3 px-5 rounded-lg bg-crimson-600 hover:bg-crimson-700 text-white font-stencil tracking-wider text-base transition shadow-lg shadow-crimson-950/70">
+                ⚔️ ROLL ATTACK DICE
+              </button>
+              <button id="resolveTurnBtn" onclick="resolveCombatTurn()" class="hidden flex-1 py-3 px-5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-stencil tracking-wider text-base transition">
+                ⚡ RESOLVE DAMAGE & ZOMBIE BITE
+              </button>
+              <button id="secondWindBtn" onclick="useSecondWind()" class="py-3 px-4 rounded-lg bg-navy-900 hover:bg-navy-800 border border-slate-700 font-mono text-xs text-blue-300 transition" title="Spend your turn rolling 0 Attack dice to recover 1 Exhausted die">
+                🫁 Second Wind
+              </button>
+            </div>
 
-        // Initialize Everything
-        renderGames();
-        setRollMode('5d');
-    </script>
-</body>
-</html>
+            <div id="combatLog" class="bg-abyss border border-slate-800 rounded-lg p-3.5 font-mono text-xs text-slate-300 h-28 overflow-y-auto space-y-1">
+              <div class="text-amber-400">&gt; Pharmacy Door breached! A Sprinter lunges from behind the counter.</div>
+              <div class="text-slate-400">&gt; Click your Stamina Dice above to assign Attack (⚔️) or Guard (🛡️), then click Roll.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ARSENAL & INFECTED SHOWCASE (FLAVOR-FIRST CARDS) -->
+  <section id="under-the-hood" class="py-20 border-b border-slate-800/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 space-y-16">
+      
+      <!-- Weapons Header -->
+      <div>
+        <div class="max-w-2xl mb-10">
+          <span class="font-mono text-xs uppercase tracking-widest text-crimson-500 font-bold">IMPROVISED LETHALITY</span>
+          <h2 class="font-stencil text-3xl sm:text-5xl text-white mt-1">WEAPONS THAT CHANGE HOW YOUR DICE BEHAVE</h2>
+          <p class="text-slate-400 mt-2 text-base">
+            No complex attack charts to memorize. Your weapon tells you which die faces hit, what happens when you roll a natural <strong class="text-white">6</strong>, and the price you pay on a <strong class="text-crimson-400">1</strong>.
+          </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Blunt -->
+          <div class="card-grit rounded-xl p-5 border-t-2 border-t-slate-400">
+            <div class="flex justify-between items-center font-mono text-xs text-slate-400 mb-2">
+              <span>BLUNT // CONTROL</span>
+              <span class="text-white font-bold">HIT: 4–6</span>
+            </div>
+            <h3 class="font-stencil text-xl text-white mb-1">CROWBAR & BAT</h3>
+            <p class="text-xs text-slate-400 mb-4">1 Damage per hit. Reliable crowd control when your stamina pool is running low.</p>
+            <div class="bg-abyss/80 p-3 rounded border border-slate-800 font-mono text-xs text-slate-300">
+              <strong class="text-amber-400">CRIT (6): KNOCKBACK</strong><br>
+              Stuns the zombie, reducing its incoming Bite Damage by 2 this round.
+            </div>
+          </div>
+
+          <!-- Bladed -->
+          <div class="card-grit rounded-xl p-5 border-t-2 border-t-crimson-500">
+            <div class="flex justify-between items-center font-mono text-xs text-crimson-400 mb-2">
+              <span>BLADED // LETHAL</span>
+              <span class="text-white font-bold">HIT: 4–6</span>
+            </div>
+            <h3 class="font-stencil text-xl text-white mb-1">FIRE AXE & MACHETE</h3>
+            <p class="text-xs text-slate-400 mb-4">2 Damage per hit. Built to cleave through high-HP threats before they can strike.</p>
+            <div class="bg-abyss/80 p-3 rounded border border-slate-800 font-mono text-xs text-slate-300">
+              <strong class="text-crimson-400">CRIT (6): 3 DMG // 1: STUCK</strong><br>
+              Rolling a 1 wedges the blade in bone—locking the die AND reducing your Guard by 1.
+            </div>
+          </div>
+
+          <!-- Agile -->
+          <div class="card-grit rounded-xl p-5 border-t-2 border-t-emerald-500">
+            <div class="flex justify-between items-center font-mono text-xs text-emerald-400 mb-2">
+              <span>AGILE // FAST</span>
+              <span class="text-white font-bold">HIT: 3–6</span>
+            </div>
+            <h3 class="font-stencil text-xl text-white mb-1">COMBAT KNIFE & TONFA</h3>
+            <p class="text-xs text-slate-400 mb-4">1 Damage per hit. High accuracy lets you land consistent strikes while holding dice back.</p>
+            <div class="bg-abyss/80 p-3 rounded border border-slate-800 font-mono text-xs text-slate-300">
+              <strong class="text-emerald-400">TRAIT: LIGHT & NIMBLE</strong><br>
+              Rolling a 1 on Round 1 of combat never locks the die as Exhausted.
+            </div>
+          </div>
+
+          <!-- Firearms -->
+          <div class="card-grit rounded-xl p-5 border-t-2 border-t-amber-500">
+            <div class="flex justify-between items-center font-mono text-xs text-amber-400 mb-2">
+              <span>FIREARMS // RANGED</span>
+              <span class="text-white font-bold">HIT: 3–6</span>
+            </div>
+            <h3 class="font-stencil text-xl text-white mb-1">9MM & RIOT SHOTGUN</h3>
+            <p class="text-xs text-slate-400 mb-4">3 Damage per hit. Ignores Sprinter speed, but costs 1 Ammo per die rolled.</p>
+            <div class="bg-abyss/80 p-3 rounded border border-slate-800 font-mono text-xs text-slate-300">
+              <strong class="text-amber-400">RISK: LOUD & HUNGRY</strong><br>
+              Raises Sector Decibels and triggers a Horde Noise Check on any rolled 1.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infected Freakshow -->
+      <div>
+        <div class="max-w-2xl mb-8">
+          <span class="font-mono text-xs uppercase tracking-widest text-amber-400 font-bold">THE UNDEAD ECOSYSTEM</span>
+          <h2 class="font-stencil text-3xl sm:text-4xl text-white mt-1">5 MUTATIONS THAT DISRUPT YOUR DICE POOL</h2>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div class="card-grit p-4 rounded-lg border-l-2 border-l-slate-500">
+            <div class="font-stencil text-lg text-white">SHAMBLER</div>
+            <div class="font-mono text-[11px] text-crimson-400 mb-2">HP: 4 // BITE: 2</div>
+            <p class="text-xs text-slate-300"><strong>Relentless Grab:</strong> Fail to deal 1+ damage on your turn and it grabs your jacket—forcing you to burn 1 extra Guard die next round.</p>
+          </div>
+          <div class="card-grit p-4 rounded-lg border-l-2 border-l-amber-500">
+            <div class="font-stencil text-lg text-white">SPRINTER</div>
+            <div class="font-mono text-[11px] text-crimson-400 mb-2">HP: 3 // BITE: 3</div>
+            <p class="text-xs text-slate-300"><strong>Blur of Speed:</strong> Melee weapons only connect on 5 or 6, forcing you to throw your whole pool into offense or get mauled.</p>
+          </div>
+          <div class="card-grit p-4 rounded-lg border-l-2 border-l-blue-500">
+            <div class="font-stencil text-lg text-white">RIOT-GEAR</div>
+            <div class="font-mono text-[11px] text-crimson-400 mb-2">HP: 8 // BITE: 2</div>
+            <p class="text-xs text-slate-300"><strong>Kevlar & Helmet:</strong> Ignores the first 1 damage each round. Can only be killed if your final blow includes a natural 6 headshot.</p>
+          </div>
+          <div class="card-grit p-4 rounded-lg border-l-2 border-l-emerald-500">
+            <div class="font-stencil text-lg text-white">BLOATER</div>
+            <div class="font-mono text-[11px] text-crimson-400 mb-2">HP: 6 // BITE: 1</div>
+            <p class="text-xs text-slate-300"><strong>Toxic Burst:</strong> Every 1 you roll inhales spores for 1 Acid damage. Melee kills require 1 held Guard die to shield the splash.</p>
+          </div>
+          <div class="card-grit p-4 rounded-lg border-l-2 border-l-crimson-600">
+            <div class="font-stencil text-lg text-white">SCREAMER</div>
+            <div class="font-mono text-[11px] text-crimson-400 mb-2">HP: 2 // BITE: 1</div>
+            <p class="text-xs text-slate-300"><strong>Piercing Shriek:</strong> Every round it survives, roll a D6: on a 5–6, a fresh Shambler breaches the room and joins the fight.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Full Designer Rules Drawer -->
+      <details class="card-grit rounded-xl p-6 group">
+        <summary class="cursor-pointer list-none flex items-center justify-between">
+          <div>
+            <span class="font-mono text-xs text-blue-400 uppercase tracking-wider block">COMPLETE SYSTEM REFERENCE</span>
+            <h3 class="font-stencil text-2xl text-white">OPEN FULL SURVIVOR PROGRESSION & 2D6 MEGAMALL TABLES</h3>
+          </div>
+          <span class="px-3 py-1.5 rounded bg-navy-900 border border-slate-700 font-mono text-xs text-slate-300 group-open:bg-crimson-600 group-open:text-white transition">
+            Toggle Rules Sheet
+          </span>
+        </summary>
+
+        <div class="mt-6 pt-6 border-t border-slate-800 grid md:grid-cols-2 gap-8 text-sm">
+          <div>
+            <h4 class="font-stencil text-lg text-amber-400 mb-3">SURVIVOR LEVELING & WORKBENCH MODS</h4>
+            <ul class="space-y-2.5 text-slate-300 text-xs leading-relaxed">
+              <li><strong class="text-white">Stamina Pool Growth:</strong> Start at Level 1 with <strong>3D6</strong>. Add +1D6 at Levels 3, 6, and 9 (Max 6D6).</li>
+              <li><strong class="text-white">Grit (Re-Rolls):</strong> Start with 1 Grit per fight to re-roll a single Attack die (essential for rescuing a rolled 1 before it locks!). Scales up to 4 Grit at higher levels.</li>
+              <li><strong class="text-white">Second Wind (Recovery):</strong> Once per combat, spend your turn rolling 0 Attack dice to unlock 1–2 Exhausted dice (1s) back into your active pool.</li>
+              <li><strong class="text-white">Settlement Workbench Mods:</strong> Attach <em>Weighted Head</em> (+1 damage when committing 3+ Attack dice) or <em>Ergonomic Grip</em> (ignore the first 1 rolled each fight).</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-stencil text-lg text-blue-400 mb-3">2D6 MEGAMALL SPLIT-DICE TABLE</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full font-mono text-[11px] text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-700 text-slate-400">
+                    <th class="py-1.5 pr-2">Roll</th>
+                    <th class="py-1.5 pr-2">Die 1: Footprint</th>
+                    <th class="py-1.5">Die 2: Zone & Threat</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/80 text-slate-300">
+                  <tr><td class="py-1.5 font-bold text-white">1</td><td>2x3 Service Hallway</td><td>Utility / Low Light</td></tr>
+                  <tr><td class="py-1.5 font-bold text-white">2</td><td>3x3 Glass Kiosk</td><td>Apparel / Bandages</td></tr>
+                  <tr><td class="py-1.5 font-bold text-white">3</td><td>3x5 Narrow Storefront</td><td>Pharmacy / Meds</td></tr>
+                  <tr><td class="py-1.5 font-bold text-white">4</td><td>4x4 Corner Unit</td><td>Security / Ammo & Alarms</td></tr>
+                  <tr><td class="py-1.5 font-bold text-white">5</td><td>4x6 Department Anchor</td><td>Food Court / Bloaters</td></tr>
+                  <tr><td class="py-1.5 font-bold text-white">6</td><td>6x6 Atrium Escalator</td><td>Evac Point / Dense Horde</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </details>
